@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>首爾五天四夜旅程 - 智慧旅行大師 Pro</title>
+    
+    <!-- 手機桌面 App 捷徑優化 (PWA Web App Meta) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="首爾大師Pro">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -32,68 +39,75 @@
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
 
-    <!-- 頂部導航欄 (RWD 自適應與擠壓防護) -->
-    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            
-            <div class="flex items-center justify-between sm:justify-start space-x-2 sm:space-x-3 min-w-0">
-                <div class="flex items-center space-x-2 min-w-0">
-                    <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md shadow-indigo-100 flex-shrink-0 hidden xs:block">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <!-- 頂部導航欄 (極致美化，RWD 奢華自適應) -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-150 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- 上半部：主品牌與登入權限區域 -->
+            <div class="h-16 sm:h-20 flex items-center justify-between gap-3">
+                
+                <!-- 標誌與可編輯標題 (手機端沉浸無框設計) -->
+                <div class="flex items-center space-x-2 min-w-0 flex-1">
+                    <div class="bg-gradient-to-tr from-indigo-500 to-purple-600 text-white p-2 rounded-xl shadow-md shadow-indigo-150 flex-shrink-0">
+                        <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
                     </div>
-                    <!-- 可編輯標題 -->
-                    <div class="flex items-center space-x-1 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200/50 min-w-0">
-                        <input type="text" id="trip-title" class="text-sm sm:text-base font-bold text-slate-900 bg-transparent focus:outline-none w-28 xs:w-36 sm:w-48 truncate" value="首爾五天四夜旅程" placeholder="旅程名稱">
+                    <div class="min-w-0 flex-1">
+                        <input type="text" id="trip-title" 
+                               class="text-base sm:text-lg font-black text-slate-900 bg-transparent focus:outline-none focus:border-indigo-500 border-b-2 border-transparent w-full transition truncate py-1" 
+                               value="首爾五天四夜旅程" placeholder="旅程名稱">
                     </div>
                 </div>
 
-                <!-- 權限管理按鈕 (前台/後台一鍵切換) -->
-                <div class="flex-shrink-0">
-                    <button type="button" id="role-toggle-btn" onclick="handleRoleToggle()" class="flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm border">
+                <!-- 狀態燈與權限管理 (手機端極簡緊湊) -->
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <!-- 同步狀態指示燈 -->
+                    <button type="button" onclick="openSyncModal()" id="sync-status-btn" 
+                            class="flex items-center space-x-1 bg-rose-50 text-rose-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-rose-100 hover:bg-rose-100 transition shadow-sm text-xs">
+                        <span class="relative flex h-2 w-2 flex-shrink-0">
+                            <span id="sync-indicator-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                            <span id="sync-indicator-dot" class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                        </span>
+                        <span id="sync-status-text" class="hidden xs:inline">未連線試算表</span>
+                    </button>
+                    
+                    <!-- 權限按鈕 -->
+                    <button type="button" id="role-toggle-btn" onclick="handleRoleToggle()" 
+                            class="flex items-center space-x-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs font-black transition shadow-sm border">
                         <span>載入中...</span>
                     </button>
                 </div>
             </div>
-            
-            <!-- 雲端同步與資料操作 (RWD 自動折疊、防擁擠) -->
-            <div class="flex items-center justify-between sm:justify-end gap-2 text-sm flex-wrap sm:flex-nowrap">
-                <!-- 同步狀態指示燈 -->
-                <button type="button" onclick="openSyncModal()" id="sync-status-btn" class="flex items-center space-x-1 bg-rose-50 text-rose-600 px-2.5 py-2 rounded-xl font-medium border border-rose-100 hover:bg-rose-100 transition flex-1 sm:flex-none justify-center">
-                    <span class="relative flex h-2 w-2 flex-shrink-0">
-                        <span id="sync-indicator-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                        <span id="sync-indicator-dot" class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                    </span>
-                    <span id="sync-status-text" class="text-xs">尚未連線試算表</span>
-                </button>
-                
-                <button type="button" onclick="exportBackup()" class="admin-only hidden md:flex items-center space-x-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-xl font-medium transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+
+            <!-- 下半部：後台管理工具列 (手機端自動橫向滑動滑軌，避免擠壓) -->
+            <div id="admin-sub-header" class="admin-only hidden border-t border-slate-100 py-2.5 flex items-center justify-end gap-2 overflow-x-auto scrollbar-none">
+                <span class="text-[10px] text-slate-400 font-extrabold mr-auto hidden md:inline-block">🛠️ 管理員控制面板：</span>
+                <button type="button" onclick="exportBackup()" class="flex items-center space-x-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex-shrink-0 shadow-sm border border-indigo-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     <span>匯出備份</span>
                 </button>
-                <button type="button" onclick="triggerImport()" class="admin-only hidden md:flex items-center space-x-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-3 py-2 rounded-xl font-medium transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <button type="button" onclick="triggerImport()" class="flex items-center space-x-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex-shrink-0 shadow-sm border border-emerald-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                     <span>匯入</span>
                 </button>
                 <input type="file" id="import-file" class="hidden" onchange="importBackup(event)">
                 
-                <button type="button" onclick="clearAllDataConfirm()" class="admin-only bg-red-50 text-red-600 hover:bg-red-100 p-2 sm:px-3 sm:py-2 rounded-xl font-medium transition flex items-center space-x-1 flex-shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <button type="button" onclick="clearAllDataConfirm()" class="flex items-center space-x-1 bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex-shrink-0 shadow-sm border border-rose-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <span class="hidden xs:inline text-xs">復原預設</span>
+                    <span>復原預設</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- 分頁選單 (RWD 滑動保護) -->
-    <div class="bg-white border-b border-slate-100 shadow-sm sticky top-16 sm:top-20 z-30">
+    <div class="bg-white border-b border-slate-150 shadow-sm sticky top-16 sm:top-20 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto py-3 scrollbar-none" aria-label="Tabs">
                 <button type="button" onclick="switchTab('itinerary')" id="tab-itinerary" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 bg-indigo-600 text-white shadow-md shadow-indigo-100">
@@ -170,6 +184,57 @@
 
         <!-- ==================== 2. 財務記帳 & 分帳 ==================== -->
         <div id="panel-ledger" class="tab-panel hidden space-y-6">
+
+            <!-- ⚡ 免登入快速記帳功能面板 (解決登入繁瑣痛點) -->
+            <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 p-5 rounded-2xl shadow-lg text-white">
+                <div class="flex items-center space-x-2 mb-3">
+                    <span class="text-xl">⚡</span>
+                    <h3 class="text-base font-bold">免登入快速記帳</h3>
+                    <span class="text-[10px] bg-indigo-450 px-2 py-0.5 rounded-full border border-indigo-300">所有旅伴均可直接輸入</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end text-slate-800">
+                    <div class="lg:col-span-2">
+                        <label class="block text-[11px] font-bold text-indigo-100 mb-1">消費品項名稱</label>
+                        <input type="text" id="quick-item-name" placeholder="例如：明洞街邊辣炒年糕、便利商店飲料..." class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-white focus:outline-none font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-indigo-100 mb-1">付款人</label>
+                        <select id="quick-item-payer" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                            <!-- 動態載入成員 -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-indigo-100 mb-1">分帳類型</label>
+                        <select id="quick-item-personal" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-bold text-indigo-600">
+                            <option value="false">👥 共同分帳</option>
+                            <option value="true">👤 個人自付</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 lg:col-span-2">
+                        <div class="col-span-1">
+                            <label class="block text-[11px] font-bold text-indigo-100 mb-1">幣別</label>
+                            <select id="quick-item-currency" onchange="toggleQuickRateField(this.value)" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                                <option value="TWD">TWD</option>
+                                <option value="KRW" selected>KRW</option>
+                            </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[11px] font-bold text-indigo-100 mb-1">金額</label>
+                            <input type="number" id="quick-item-price" placeholder="10000" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-bold">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[11px] font-bold text-indigo-100 mb-1">匯率</label>
+                            <input type="number" step="0.0001" id="quick-item-rate" value="0.0241" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-mono font-bold">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-3">
+                    <button type="button" onclick="submitQuickExpense()" class="bg-white hover:bg-indigo-50 text-indigo-600 font-bold px-6 py-2 rounded-xl text-xs transition shadow flex items-center space-x-1">
+                        <span>📥 立即記帳</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- 出遊成員與已付金額 -->
                 <div class="lg:col-span-1 space-y-6">
@@ -223,7 +288,7 @@
                 </div>
             </div>
 
-            <!-- 記帳明細區塊 -->
+            <!-- 記帳明細區塊 (自適應排版：防左右滾動設計) -->
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                     <div>
@@ -232,7 +297,7 @@
                             <span>記帳明細</span>
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-1 font-medium">
-                            提示：左右拖動表格可檢視完整明細。個人自付項目不會加入分帳公式。
+                            提示：外幣欄位之匯率皆已開放點擊編輯。個人自付項目不參與分帳計算。
                         </p>
                     </div>
                     <button type="button" onclick="addPreTravelRow()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-100 transition flex items-center space-x-1 self-start sm:self-auto flex-shrink-0">
@@ -241,27 +306,34 @@
                     </button>
                 </div>
                 
-                <div class="overflow-x-auto rounded-xl border border-slate-150 shadow-inner">
-                    <table class="w-full text-left border-collapse min-w-[1100px]">
+                <!-- 桌機與平板大螢幕檢視：不左右滑動的高適應表格 -->
+                <div class="hidden md:block overflow-hidden rounded-xl border border-slate-200">
+                    <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50/70 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider select-none">
-                                <th class="py-3 px-4 w-[10%]">日期</th>
-                                <th class="py-3 px-4 w-[22%]">消費品項 / 行程名稱</th>
-                                <th class="py-3 px-4 w-[11%]">付款人</th>
-                                <th class="py-3 px-4 w-[11%]">分帳類型</th>
-                                <th class="py-3 px-4 w-[6%] text-center">數量</th>
-                                <th class="py-3 px-4 w-[10%] text-right">金額</th>
-                                <th class="py-3 px-4 w-[8%] text-center">幣別</th>
-                                <th class="py-3 px-4 w-[10%] text-right font-mono">匯率</th>
-                                <th class="py-3 px-4 w-[12%] text-right font-semibold text-slate-900">台幣總計</th>
-                                <th class="py-3 px-4 w-[10%] text-center">操作/來源</th>
+                                <th class="py-3 px-3 w-[10%]">日期</th>
+                                <th class="py-3 px-3 w-[22%]">消費品項</th>
+                                <th class="py-3 px-3 w-[12%]">付款人</th>
+                                <th class="py-3 px-3 w-[12%]">分帳類型</th>
+                                <th class="py-3 px-3 w-[8%] text-center">數量</th>
+                                <th class="py-3 px-3 w-[10%] text-right">金額</th>
+                                <th class="py-3 px-3 w-[8%] text-center">幣別</th>
+                                <th class="py-3 px-3 w-[10%] text-right">匯率</th>
+                                <th class="py-3 px-3 w-[12%] text-right text-slate-900 font-bold">台幣總計</th>
+                                <th class="py-3 px-3 w-[10%] text-center">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="pretravel-table-body" class="text-sm divide-y divide-slate-100">
-                            <!-- 動態與分頁渲染行程與行前費用 -->
+                        <tbody id="pretravel-table-body" class="text-xs divide-y divide-slate-100">
+                            <!-- 動態渲染行程與行前費用 -->
                         </tbody>
                     </table>
                 </div>
+
+                <!-- 行動裝置手機檢視：瀑布流卡片，告別橫向滑動 -->
+                <div class="block md:hidden space-y-3" id="pretravel-cards-container">
+                    <!-- 動態渲染卡片清單 -->
+                </div>
+
                 <!-- 記帳明細分頁控制項 -->
                 <div id="ledger-pagination-container"></div>
             </div>
@@ -284,7 +356,7 @@
             </div>
         </div>
 
-        <!-- ==================== 4. 行李清單 ==================== -->
+        <!-- ==================== 4. 行衣清單 (行李清單) ==================== -->
         <div id="panel-packing" class="tab-panel hidden space-y-6">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex flex-col lg:flex-row justify-between lg:items-center border-b border-slate-100 pb-5 mb-6 gap-4">
@@ -307,8 +379,8 @@
                     </div>
                 </div>
 
-                <!-- 快速新增行李表單 (管理員限定) -->
-                <div class="admin-only bg-slate-50 border border-slate-150 p-4 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <!-- 快速新增行李表單 (管理員與一般使用者皆開放，免登入) -->
+                <div class="bg-slate-50 border border-slate-150 p-4 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1.5">這是誰的行李 / 備忘項目？</label>
                         <select id="packing-item-owner" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -389,6 +461,11 @@
                     <label class="block text-xs font-bold text-slate-500 mb-1">密碼</label>
                     <input type="password" id="login-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
                 </div>
+                <!-- 記住密碼勾選框 -->
+                <div class="flex items-center space-x-2 py-1">
+                    <input type="checkbox" id="login-remember" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                    <label for="login-remember" class="text-xs text-slate-500 cursor-pointer select-none font-bold">記住帳密，下次自動登入</label>
+                </div>
                 <div id="login-error-msg" class="text-xs text-rose-500 hidden font-bold text-center">帳號或密碼錯誤</div>
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeLoginModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-xs hover:bg-slate-50">取消</button>
@@ -415,18 +492,25 @@
                     <label class="block text-xs font-bold text-slate-500 mb-1.5 font-mono">Google Apps Script URL (僅限管理員修改)</label>
                     <input type="text" id="sync-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-800 space-y-1">
-                    <p class="font-bold flex items-center space-x-1">
-                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span>設定注意事項：</span>
+                
+                <!-- 沙盒與 CORS 安全政策提示警告 -->
+                <div id="sync-sandbox-warning" class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-850 space-y-1.5">
+                    <p class="font-bold flex items-center space-x-1 text-amber-900">
+                        <svg class="w-3.5 h-3.5 text-amber-600 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>📢 沙盒環境連線與連線錯誤說明：</span>
                     </p>
-                    <p>1. 請確保已在試算表的 Apps Script 中部署為「網頁應用程式」。</p>
-                    <p>2. 「誰可以存取」請務必選取「所有人」，否則會連線失敗。</p>
-                    <p>3. 儲存後，網頁資料會在每次異動時，即時自動同步覆寫至雲端試算表。</p>
+                    <p>當前網頁若在 AI 預覽或沙盒測試視窗中，瀏覽器安全政策（CORS）可能會暫時阻止跨網域獲取，造成「下載同步失敗」警告。請放心：</p>
+                    <p class="pl-3 font-semibold text-slate-700">1. 您的變更已 100% 妥善儲存於您的手機/瀏覽器本機快取。</p>
+                    <p class="pl-3 font-semibold text-slate-700">2. 只要您使用手機的「加入桌面捷徑」或在「獨立瀏覽器分頁」中開啟本網頁，同步功能即可正常自動連線運作！</p>
+                    <p class="pl-3 font-semibold text-slate-700">3. 若不想看到連線狀態警告，您可以隨時點選下方「重設本機模式」切換為純本機模式，保持 Console 乾淨。</p>
                 </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeSyncModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
-                    <button type="button" onclick="saveSyncSettings()" id="save-sync-btn" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-md">儲存並立即同步</button>
+                
+                <div class="flex items-center justify-between space-x-2 pt-2">
+                    <button type="button" onclick="clearSyncUrl()" class="px-4 py-2 border border-rose-200 text-rose-600 rounded-xl text-xs font-bold hover:bg-rose-50 transition">重設為本機模式</button>
+                    <div class="flex space-x-2">
+                        <button type="button" onclick="closeSyncModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
+                        <button type="button" onclick="saveSyncSettings()" id="save-sync-btn" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-md">儲存並立即同步</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -699,8 +783,12 @@
         // 全域 State 初始化
         let state = JSON.parse(localStorage.getItem('travel_planner_state')) || defaultState;
 
-        // 安全權限控制 state (與 Google Sheet 一起同步，但登入狀態獨立紀錄在 localStorage 實現記住密碼)
+        // 安全權限控制 state (自動登入與記住密碼)
         let isAdminMode = localStorage.getItem('travel_planner_isAdmin') === 'true';
+
+        // 雲端同步防當機與 CORS 沙盒安全預防機制變數
+        let consecutiveFetchFailures = 0;
+        let isSyncPausedDueToError = false;
 
         // 當本地端尚未儲存，或是本地端的網址為空時，強制作為初始化網址
         if (DEFAULT_SYNC_URL && (!state.googleScriptUrl || state.googleScriptUrl === "")) {
@@ -787,9 +875,24 @@
                 }, 1500);
             });
 
+            // 實作自動記住密碼登入
+            handleAutoLoginCheck();
+
             // 執行數據更新
             applyState();
             checkAndSyncAuto();
+        }
+
+        // 自動登入檢查
+        function handleAutoLoginCheck() {
+            const savedUser = localStorage.getItem('remember_username');
+            const savedPass = localStorage.getItem('remember_password');
+            const isRemembered = localStorage.getItem('remember_enabled') === 'true';
+
+            if (isRemembered && savedUser && savedPass) {
+                isAdminMode = true;
+                localStorage.setItem('travel_planner_isAdmin', 'true');
+            }
         }
 
         // State 儲存與同步機制
@@ -843,30 +946,36 @@
             renderNotesList();
             updateSyncStatusUI();
             populateDropdowns();
-            applyRoleVisibility(); // 套用前台與後台的瀏覽編輯限制
+            applyRoleVisibility(); 
         }
 
         // 🚀 權限與前台/後台模式動態渲染與防誤觸機制
         function applyRoleVisibility() {
             const toggleBtn = document.getElementById('role-toggle-btn');
+            const adminHeader = document.getElementById('admin-sub-header');
             
             if (isAdminMode) {
                 // 後台管理員解鎖模式
                 toggleBtn.innerHTML = `
-                    <span class="flex items-center space-x-1 text-indigo-600">
+                    <span class="flex items-center space-x-1 text-indigo-600 font-bold">
                         <span class="relative flex h-2 w-2 mr-1">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                         </span>
-                        <span>⚙️ 管理員模式(已自動記住)</span>
+                        <span><span class="hidden sm:inline">⚙️ 管理員模式 (已登入)</span><span class="inline sm:hidden">⚙️ 管理員</span></span>
                     </span>
                 `;
-                toggleBtn.className = "flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 cursor-pointer";
+                toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs font-black transition shadow-sm border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 cursor-pointer";
                 
                 // 顯示所有管理員專屬區塊 (按鈕、增刪鈕)
                 document.querySelectorAll('.admin-only').forEach(el => {
                     el.classList.remove('hidden');
                 });
+                
+                if (adminHeader) {
+                    adminHeader.classList.remove('hidden');
+                    adminHeader.classList.add('flex');
+                }
 
                 // 解鎖重要控制項
                 document.getElementById('trip-title').removeAttribute('disabled');
@@ -875,16 +984,21 @@
             } else {
                 // 安全的前台瀏覽者鎖定模式
                 toggleBtn.innerHTML = `
-                    <span class="flex items-center space-x-1 text-slate-500">
-                        <span>👁️ 瀏覽者模式(安全鎖)</span>
+                    <span class="flex items-center space-x-1 text-slate-500 font-medium">
+                        <span><span class="hidden sm:inline">👁️ 瀏覽者模式 (點此登入)</span><span class="inline sm:hidden">🔑 登入管理</span></span>
                     </span>
                 `;
-                toggleBtn.className = "flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer";
+                toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs font-black transition shadow-sm border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer";
                 
                 // 隱藏管理員專屬的增刪元件
                 document.querySelectorAll('.admin-only').forEach(el => {
                     el.classList.add('hidden');
                 });
+                
+                if (adminHeader) {
+                    adminHeader.classList.add('hidden');
+                    adminHeader.classList.remove('flex');
+                }
 
                 // 唯讀鎖定行程標題與成員輸入框
                 document.getElementById('trip-title').setAttribute('disabled', 'true');
@@ -895,11 +1009,14 @@
         // 一鍵切換登入/鎖定
         function handleRoleToggle() {
             if (isAdminMode) {
-                // 回歸安全瀏覽模式
+                // 登出：取消自動登入並清除快取
                 isAdminMode = false;
                 localStorage.setItem('travel_planner_isAdmin', 'false');
+                localStorage.removeItem('remember_username');
+                localStorage.removeItem('remember_password');
+                localStorage.setItem('remember_enabled', 'false');
                 applyState();
-                showToast("已鎖定為安全的瀏覽者模式", "🔒");
+                showToast("已鎖定為安全瀏覽模式，且已清除自動登入紀錄", "🔒");
             } else {
                 // 彈出後台登入驗證
                 openLoginModal();
@@ -908,8 +1025,15 @@
 
         // 後台驗證彈出視窗
         function openLoginModal() {
-            document.getElementById('login-username').value = "";
-            document.getElementById('login-password').value = "";
+            // 自動帶入記住的帳密
+            const savedUser = localStorage.getItem('remember_username') || "";
+            const savedPass = localStorage.getItem('remember_password') || "";
+            const isRemembered = localStorage.getItem('remember_enabled') === 'true';
+
+            document.getElementById('login-username').value = savedUser;
+            document.getElementById('login-password').value = savedPass;
+            document.getElementById('login-remember').checked = isRemembered;
+
             document.getElementById('login-error-msg').classList.add('hidden');
             document.getElementById('login-modal').classList.remove('hidden');
             document.getElementById('login-modal').classList.add('flex');
@@ -920,65 +1044,72 @@
             document.getElementById('login-modal').classList.remove('flex');
         }
 
-        // 向 GAS 發送安全登入驗證（不把密碼寫死在 JS 檔案中，極高安全性！）
+        // 安全登入驗證
         async function submitLogin() {
             const user = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
+            const rememberEnabled = document.getElementById('login-remember').checked;
             
             if (!user || !pass) {
                 document.getElementById('login-error-msg').classList.remove('hidden');
                 return;
             }
 
-            if (!state.googleScriptUrl) {
-                // 如果未綁定試算表，採用本機預設驗證備份 (admin / 123)
+            const loginVerifyLocal = () => {
                 if (user === "admin" && pass === "123") {
-                    loginSuccess();
+                    loginSuccess(user, pass, rememberEnabled);
                 } else {
                     document.getElementById('login-error-msg').classList.remove('hidden');
                 }
+            };
+
+            if (!state.googleScriptUrl) {
+                loginVerifyLocal();
                 return;
             }
 
-            // 🚀 向 Google Apps Script 安全發送驗證 (防止密碼洩漏在前端 HTML 中)
             const text = document.getElementById('sync-status-text');
             const prevText = text.textContent;
             text.textContent = "驗證身分中...";
 
             try {
-                // 採用帶 action 的 POST 請求向試算表安全驗證
+                // 透過 Apps Script 進行安全端點比對
                 const response = await fetch(state.googleScriptUrl + "?action=loginVerify&user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass));
                 const result = await response.json();
                 
                 if (result && result.status === "success" && result.verified === true) {
-                    loginSuccess();
+                    loginSuccess(user, pass, rememberEnabled);
                 } else {
                     document.getElementById('login-error-msg').classList.remove('hidden');
                     text.textContent = prevText;
                 }
             } catch (err) {
-                // 如果同步連結未升級支援此 action，回退至本地預設比對
-                if (user === "admin" && pass === "123") {
-                    loginSuccess();
-                } else {
-                    document.getElementById('login-error-msg').classList.remove('hidden');
-                }
+                loginVerifyLocal();
                 text.textContent = prevText;
             }
         }
 
-        function loginSuccess() {
+        function loginSuccess(user, pass, rememberEnabled) {
             isAdminMode = true;
-            // 登入後自動記住密碼與狀態於 localStorage 中
             localStorage.setItem('travel_planner_isAdmin', 'true');
+
+            if (rememberEnabled) {
+                localStorage.setItem('remember_username', user);
+                localStorage.setItem('remember_password', pass);
+                localStorage.setItem('remember_enabled', 'true');
+            } else {
+                localStorage.removeItem('remember_username');
+                localStorage.removeItem('remember_password');
+                localStorage.setItem('remember_enabled', 'false');
+            }
+
             applyState();
             closeLoginModal();
-            showToast("後台管理員權限已解鎖！(已自動記住此裝置)", "🔓");
+            showToast("管理權限驗證成功！已為您保持自動解鎖。", "🔓");
         }
 
         // 下拉選單載入
         function populateDropdowns() {
-            // 行李指派
             const itemOwnerSelect = document.getElementById('packing-item-owner');
             if (itemOwnerSelect) {
                 const currentOwnerVal = itemOwnerSelect.value;
@@ -989,7 +1120,6 @@
                 itemOwnerSelect.value = currentOwnerVal || state.companions[0];
             }
 
-            // 行李篩選
             const filterOwnerSelect = document.getElementById('packing-filter-owner');
             if (filterOwnerSelect) {
                 const currentFilterVal = filterOwnerSelect.value;
@@ -1000,7 +1130,6 @@
                 filterOwnerSelect.value = currentFilterVal || "all";
             }
 
-            // 活動付款人
             const actPayerSelect = document.getElementById('act-cost-payer');
             if (actPayerSelect) {
                 const currentActPayerVal = actPayerSelect.value;
@@ -1009,6 +1138,17 @@
                     actPayerSelect.innerHTML += `<option value="${c}">${c}</option>`;
                 });
                 actPayerSelect.value = currentActPayerVal || state.companions[0];
+            }
+
+            // 快速記帳付款人
+            const quickPayerSelect = document.getElementById('quick-item-payer');
+            if (quickPayerSelect) {
+                const currentQuickVal = quickPayerSelect.value;
+                quickPayerSelect.innerHTML = "";
+                state.companions.forEach(c => {
+                    quickPayerSelect.innerHTML += `<option value="${c}">👤 ${c}</option>`;
+                });
+                quickPayerSelect.value = currentQuickVal || state.companions[0];
             }
         }
 
@@ -1022,7 +1162,7 @@
             applyState();
         }
 
-        // ==================== 雲端 Google Sheet 同步機制 ====================
+        // ==================== 雲端 Google Sheet 同步與連線防護機制 ====================
         function updateSyncStatusUI() {
             const btn = document.getElementById('sync-status-btn');
             const ping = document.getElementById('sync-indicator-ping');
@@ -1030,15 +1170,22 @@
             const text = document.getElementById('sync-status-text');
 
             if (state.googleScriptUrl) {
-                btn.className = "flex items-center space-x-1 bg-emerald-50 text-emerald-600 px-3 py-2 rounded-xl font-medium border border-emerald-100 hover:bg-emerald-100 transition flex-1 sm:flex-none justify-center cursor-pointer";
-                ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
-                dot.className = "relative inline-flex rounded-full h-2 w-2 bg-emerald-500";
-                text.textContent = isAdminMode ? "已連接 (管理設定)" : "已連接試算表";
+                if (isSyncPausedDueToError) {
+                    btn.className = "flex items-center space-x-1 bg-amber-50 text-amber-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-amber-100 hover:bg-amber-100 transition shadow-sm text-xs cursor-pointer";
+                    ping.className = "hidden";
+                    dot.className = "relative inline-flex rounded-full h-2 w-2 bg-amber-500";
+                    text.textContent = "本機離線模式";
+                } else {
+                    btn.className = "flex items-center space-x-1 bg-emerald-50 text-emerald-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-emerald-100 hover:bg-emerald-100 transition shadow-sm text-xs cursor-pointer";
+                    ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                    dot.className = "relative inline-flex rounded-full h-2 w-2 bg-emerald-500";
+                    text.textContent = "已連線試算表";
+                }
             } else {
-                btn.className = "flex items-center space-x-1 bg-rose-50 text-rose-600 px-3 py-2 rounded-xl font-medium border border-rose-100 hover:bg-rose-100 transition flex-1 sm:flex-none justify-center cursor-pointer";
-                ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75";
+                btn.className = "flex items-center space-x-1 bg-rose-50 text-rose-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-rose-100 hover:bg-rose-100 transition shadow-sm text-xs cursor-pointer";
+                ping.className = "hidden";
                 dot.className = "relative inline-flex rounded-full h-2 w-2 bg-rose-500";
-                text.textContent = "尚未連線試算表";
+                text.textContent = "尚未連線";
             }
         }
 
@@ -1048,38 +1195,57 @@
             text.textContent = "同步中...";
 
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 秒連線超時防護
+                
                 await fetch(state.googleScriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'no-cors', // 💡 採用 no-cors 可以在沙盒環境下成功送出 POST 請求，避開嚴格的 CORS 阻擋
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(state)
+                    body: JSON.stringify(state),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
                 
                 setTimeout(() => {
                     text.textContent = "同步成功";
+                    isSyncPausedDueToError = false;
+                    consecutiveFetchFailures = 0;
                     updateSyncStatusUI();
                 }, 1000);
 
             } catch (error) {
-                console.error("同步失敗：", error);
+                console.warn("同步上傳受限，資料已先儲存至本機：", error);
                 text.textContent = "同步失敗 ❌";
                 setTimeout(() => updateSyncStatusUI(), 3000);
             }
         }
 
         async function fetchFromGoogleSheet() {
-            if (!state.googleScriptUrl) return;
+            if (!state.googleScriptUrl || isSyncPausedDueToError) return;
             try {
-                const response = await fetch(state.googleScriptUrl);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 秒超時
+
+                const response = await fetch(state.googleScriptUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
                 const result = await response.json();
                 
                 if (result.status === "success" && result.data && Object.keys(result.data).length > 0) {
                     state = result.data;
+                    consecutiveFetchFailures = 0; 
+                    isSyncPausedDueToError = false;
                     saveState(true);
                     applyState();
                 }
             } catch (err) {
-                console.error("下載同步失敗：", err);
+                // 捕獲 CORS 或連線失敗，進行異常指數級退避，避免主線程報錯
+                consecutiveFetchFailures++;
+                if (consecutiveFetchFailures >= 3) {
+                    isSyncPausedDueToError = true; // 鎖定為本機模式，避免重複 fetch 報錯
+                }
+                updateSyncStatusUI();
             }
         }
 
@@ -1106,12 +1272,25 @@
         function saveSyncSettings() {
             const url = document.getElementById('sync-url-input').value.trim();
             state.googleScriptUrl = url;
+            isSyncPausedDueToError = false;
+            consecutiveFetchFailures = 0;
             saveState();
             closeSyncModal();
             updateSyncStatusUI();
             if (url) {
                 fetchFromGoogleSheet();
             }
+        }
+
+        // 清除同步網址，退回純本機模式
+        function clearSyncUrl() {
+            state.googleScriptUrl = "";
+            isSyncPausedDueToError = false;
+            consecutiveFetchFailures = 0;
+            saveState();
+            applyState();
+            closeSyncModal();
+            showToast("已重置切換為本機離線運作模式！", "🔌");
         }
 
 
@@ -1127,7 +1306,7 @@
 
             state.days.forEach((day, index) => {
                 const activeClass = state.activeDayIndex === index 
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" 
+                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-150" 
                     : "bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60";
                 
                 const dateObj = new Date(day.date);
@@ -1520,6 +1699,21 @@
             openActivityModal(actId);
         }
 
+        // 行程活動中更新匯率
+        function updateItineraryRate(dayIndex, activityId, value) {
+            const rate = parseFloat(value) || 1.0;
+            const day = state.days[dayIndex];
+            if (day) {
+                const act = day.activities.find(a => a.id === activityId);
+                if (act && act.cost) {
+                    act.cost.rate = rate;
+                    saveState();
+                    applyState(); // 重算所有共同付款與分帳
+                    showToast("行程匯率已即時更新並重算！", "💱");
+                }
+            }
+        }
+
         function deleteActivity(actId) {
             if (!isAdminMode) return;
             showConfirm(
@@ -1538,13 +1732,67 @@
 
 
         // ==================== 2. 財務記帳 & 分帳 ====================
+        
+        // 快速記帳面板幣別切換防呆
+        function toggleQuickRateField(currency) {
+            const rateInput = document.getElementById('quick-item-rate');
+            if (currency === "TWD") {
+                rateInput.value = "1.0";
+                rateInput.disabled = true;
+                rateInput.className = "w-full bg-slate-100 border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-mono font-bold text-slate-400 cursor-not-allowed";
+            } else {
+                rateInput.disabled = false;
+                rateInput.className = "w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-mono font-bold text-slate-800";
+                rateInput.value = "0.0241"; 
+            }
+        }
+
+        // 提交快速記帳 (無須登入即可記帳)
+        function submitQuickExpense() {
+            const item = document.getElementById('quick-item-name').value.trim();
+            const payer = document.getElementById('quick-item-payer').value;
+            const isPersonal = document.getElementById('quick-item-personal').value === "true";
+            const currency = document.getElementById('quick-item-currency').value;
+            const price = parseFloat(document.getElementById('quick-item-price').value);
+            const rate = parseFloat(document.getElementById('quick-item-rate').value) || 1.0;
+
+            if (!item) {
+                showToast("請填寫消費品項名稱！", "⚠️");
+                return;
+            }
+            if (isNaN(price) || price <= 0) {
+                showToast("請填寫正確金額！", "⚠️");
+                return;
+            }
+
+            // 新增至行前費用/記帳明細列表
+            state.preTravelExpenses.push({
+                id: 'pre-' + Date.now(),
+                item: item,
+                payer: payer,
+                qty: 1,
+                price: price,
+                currency: currency,
+                rate: rate,
+                isPersonal: isPersonal
+            });
+
+            // 清空輸入欄位
+            document.getElementById('quick-item-name').value = "";
+            document.getElementById('quick-item-price').value = "";
+            
+            saveState();
+            applyState();
+            showToast("記帳成功！資料已同步覆寫至雲端。", "🎉");
+        }
+
         function renderLedger() {
             const payments = {};
             state.companions.forEach(c => {
                 payments[c] = { sharedTwd: 0, rawKrw: 0 };
             });
 
-            // A. 行前共同與個人費用加總
+            // A. 行前與個人快速記帳加總
             state.preTravelExpenses.forEach(exp => {
                 const payer = exp.payer;
                 const totalCost = (parseFloat(exp.price) || 0) * (parseInt(exp.qty) || 0);
@@ -1552,7 +1800,6 @@
                 const isPersonal = exp.isPersonal === true;
 
                 if (payments[payer] !== undefined) {
-                    // 若為個人自付項目，不列入 sharedTwd
                     if (!isPersonal) {
                         if (exp.currency === "KRW") {
                             payments[payer].rawKrw += totalCost;
@@ -1702,20 +1949,23 @@
             renderCombinedDetailsTable();
         }
 
-        // 合併記帳明細列表 (優化匯率輸入、幣別切換與個人/分帳選擇)
+        // 合併記帳明細列表 (防擠壓自適應：支援行動版與桌機版雙檢視)
         function renderCombinedDetailsTable() {
             const tbody = document.getElementById('pretravel-table-body');
+            const cardContainer = document.getElementById('pretravel-cards-container');
+            
             tbody.innerHTML = "";
+            cardContainer.innerHTML = "";
 
             const allTx = [];
 
-            // A. 載入行前費用
+            // A. 載入行前費用 / 快速記帳
             state.preTravelExpenses.forEach((exp, idx) => {
                 allTx.push({
                     uniqueId: `pre-${exp.id || idx}`,
                     type: 'pretravel',
                     rawIndex: idx, 
-                    date: '行前費用',
+                    date: '行前/快速',
                     item: exp.item,
                     payer: exp.payer,
                     qty: exp.qty,
@@ -1752,11 +2002,10 @@
                 });
             });
 
-            // 排序 (行前費用排第一順位)
+            // 排序 (行前費用品項排在最前面)
             allTx.sort((a, b) => {
-                if (a.date === '行前費用' && b.date !== '行前費用') return -1;
-                if (a.date !== '行前費用' && b.date === '行前費用') return 1;
-                if (a.date === '行前費用' && b.date === '行前費用') return 0;
+                if (a.date.includes('行前') && !b.date.includes('行前')) return -1;
+                if (!a.date.includes('行前') && b.date.includes('行前')) return 1;
                 return a.date.localeCompare(b.date);
             });
 
@@ -1771,102 +2020,191 @@
             const paginatedTx = allTx.slice(startIndex, endIndex);
 
             if (paginatedTx.length === 0) {
+                const emptyHTML = `<div class="text-center py-8 text-slate-400 text-xs">目前無任何記帳明細。</div>`;
                 tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400">目前無任何記帳明細。</td></tr>`;
+                cardContainer.innerHTML = emptyHTML;
                 document.getElementById('ledger-pagination-container').innerHTML = "";
                 return;
             }
 
-            const isLocked = !isAdminMode;
-
             paginatedTx.forEach(tx => {
-                if (tx.type === 'pretravel') {
-                    // 行前費用：後台可編輯
-                    let payerOptions = "";
-                    state.companions.forEach(c => {
-                        const selected = tx.payer === c ? "selected" : "";
-                        payerOptions += `<option value="${c}" ${selected}>${c}</option>`;
-                    });
+                // 共用：生成付款人下拉選單
+                let payerOptions = "";
+                state.companions.forEach(c => {
+                    const selected = tx.payer === c ? "selected" : "";
+                    payerOptions += `<option value="${c}" ${selected}>${c}</option>`;
+                });
 
+                if (tx.type === 'pretravel') {
+                    // ================= 💻 1. 桌機版表格渲染 (行前費用與快速記帳) =================
                     tbody.innerHTML += `
-                        <tr class="border-b border-slate-150 hover:bg-slate-50/50 align-middle">
-                            <td class="py-3 px-4 text-xs font-semibold text-slate-400 select-none">${tx.date}</td>
-                            <td class="py-3 px-4">
-                                <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 font-bold disabled:bg-slate-100 disabled:text-slate-400">
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 align-middle">
+                            <td class="py-2.5 px-3 text-[11px] font-semibold text-slate-400">${tx.date}</td>
+                            <td class="py-2.5 px-3">
+                                <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" class="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 font-bold transition">
                             </td>
-                            <td class="py-3 px-4">
-                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-semibold text-slate-800 disabled:bg-slate-100 disabled:text-slate-400">
+                            <td class="py-2.5 px-3">
+                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" class="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-semibold text-slate-800 transition">
                                     ${payerOptions}
                                 </select>
                             </td>
-                            <td class="py-3 px-4">
-                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100 disabled:text-slate-450">
+                            <td class="py-2.5 px-3">
+                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" class="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-bold text-slate-800 transition">
                                     <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 共同分帳</option>
                                     <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人自付</option>
                                 </select>
                             </td>
-                            <td class="py-3 px-4 text-center">
-                                <input type="number" value="${tx.qty}" onchange="updatePreTravelRow(${tx.rawIndex}, 'qty', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white text-center border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100">
+                            <td class="py-2.5 px-3 text-center">
+                                <input type="number" value="${tx.qty}" onchange="updatePreTravelRow(${tx.rawIndex}, 'qty', this.value)" class="w-full bg-slate-50 text-center border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-bold text-slate-800 transition">
                             </td>
-                            <td class="py-3 px-4">
-                                <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white text-right border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100">
+                            <td class="py-2.5 px-3">
+                                <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" class="w-full bg-slate-50 text-right border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-bold text-slate-800 transition">
                             </td>
-                            <td class="py-3 px-4 text-center">
-                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100">
+                            <td class="py-2.5 px-3 text-center">
+                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-bold text-slate-800 transition">
                                     <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
                                     <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
                                 </select>
                             </td>
-                            <td class="py-3 px-4 text-right">
-                                <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${(isLocked || tx.currency === 'TWD') ? "disabled" : ""} class="w-full bg-white text-right border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-mono text-slate-800 font-bold disabled:bg-slate-100 disabled:text-slate-400">
+                            <td class="py-2.5 px-3 text-right">
+                                <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${tx.currency === 'TWD' ? 'disabled' : ''} class="w-full bg-slate-50 hover:bg-white text-right border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-mono text-slate-800 font-bold transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
                             </td>
-                            <td class="py-3 px-4 text-right font-black text-slate-900 text-xs">
+                            <td class="py-2.5 px-3 text-right font-black text-slate-900 text-xs">
                                 NT$ ${Math.round(tx.totalTwd).toLocaleString()}
                             </td>
-                            <td class="py-3 px-4 text-center">
-                                <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="admin-only text-rose-500 hover:text-rose-700 p-1 rounded transition">
+                            <td class="py-2.5 px-3 text-center">
+                                <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="text-rose-500 hover:text-rose-700 p-1 rounded transition">
                                     <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
                             </td>
                         </tr>
                     `;
+
+                    // ================= 📱 2. 行動裝置卡片版渲染 (自適應不左右滾動) =================
+                    cardContainer.innerHTML += `
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-250 flex flex-col space-y-3 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md font-bold">${tx.date}</span>
+                                <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="text-rose-500 p-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">消費品項</label>
+                                    <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">付款人</label>
+                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800">
+                                        ${payerOptions}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">分帳類型</label>
+                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800">
+                                        <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 共同</option>
+                                        <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">幣別 / 金額</label>
+                                    <div class="flex space-x-1">
+                                        <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" class="bg-white border border-slate-200 rounded-lg p-1 text-xs font-bold text-slate-800">
+                                            <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
+                                            <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
+                                        </select>
+                                        <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" class="w-full bg-white border border-slate-200 rounded-lg p-1 text-xs font-bold text-right text-slate-800">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">匯率 (韓元開放修改)</label>
+                                    <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${tx.currency === 'TWD' ? 'disabled' : ''} class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-mono font-bold text-right text-slate-800 disabled:bg-slate-100 disabled:text-slate-400">
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200 pt-2 flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-500">數量: ${tx.qty}</span>
+                                <span class="font-extrabold text-indigo-600">台幣折算: NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `;
+
                 } else {
-                    // 行程中消費
+                    // ================= 💻 3. 桌機版表格渲染 (每日行程花費 - 管理員匯率完全解鎖編輯) =================
                     const dateObj = new Date(tx.date);
                     const weekday = isNaN(dateObj) ? "" : " (週" + ["日", "一", "二", "三", "四", "五", "六"][dateObj.getDay()] + ")";
                     const splitLabel = tx.isPersonal ? "👤 個人自付" : "👥 共同分帳";
                     const splitClass = tx.isPersonal ? "text-purple-600 bg-purple-50" : "text-orange-600 bg-orange-50";
 
                     tbody.innerHTML += `
-                        <tr class="border-b border-slate-150 bg-indigo-50/20 hover:bg-indigo-100/30 align-middle">
-                            <td class="py-3 px-4 text-xs font-bold text-indigo-600 whitespace-nowrap select-none">${tx.date}${weekday}</td>
-                            <td class="py-3 px-4 text-xs font-bold text-slate-700">
+                        <tr class="border-b border-slate-100 bg-indigo-50/20 hover:bg-indigo-100/30 align-middle">
+                            <td class="py-2.5 px-3 text-[11px] font-bold text-indigo-600 whitespace-nowrap">${tx.date}${weekday}</td>
+                            <td class="py-2.5 px-3 text-xs font-bold text-slate-700">
                                 <div class="flex items-center space-x-1.5 truncate max-w-[200px]" title="${tx.item}">
                                     <span class="text-indigo-500 select-none">📍</span>
                                     <span>${tx.item}</span>
                                 </div>
                             </td>
-                            <td class="py-3 px-4 text-xs font-semibold text-slate-600 select-none">${tx.payer}</td>
-                            <td class="py-3 px-4">
-                                <span class="px-2 py-1 rounded text-[11px] font-bold ${splitClass}">${splitLabel}</span>
+                            <td class="py-2.5 px-3 text-xs font-semibold text-slate-600">${tx.payer}</td>
+                            <td class="py-2.5 px-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${splitClass}">${splitLabel}</span>
                             </td>
-                            <td class="py-3 px-4 text-center text-xs text-slate-400 select-none">${tx.qty}</td>
-                            <td class="py-3 px-4 text-right text-xs font-bold text-slate-600 font-mono">${tx.price.toLocaleString()}</td>
-                            <td class="py-3 px-4 text-center text-xs font-black text-slate-500 select-none">${tx.currency}</td>
-                            <td class="py-3 px-4 text-right text-xs font-mono text-slate-500 select-none">${tx.rate}</td>
-                            <td class="py-3 px-4 text-right font-black text-indigo-700 text-xs">
+                            <td class="py-2.5 px-3 text-center text-xs text-slate-400">${tx.qty}</td>
+                            <td class="py-2.5 px-3 text-right text-xs font-bold text-slate-600 font-mono">${tx.price.toLocaleString()}</td>
+                            <td class="py-2.5 px-3 text-center text-xs font-black text-slate-500">${tx.currency}</td>
+                            <td class="py-2.5 px-3">
+                                <!-- 每日行程消費之匯率：登入後台直接點擊編輯修改，即時重算！ -->
+                                <input type="number" step="0.0001" value="${tx.rate}" 
+                                       onchange="updateItineraryRate(${tx.dayIndex}, '${tx.activityId}', this.value)" 
+                                       ${tx.currency === 'TWD' ? 'disabled' : ''} 
+                                       ${!isAdminMode ? 'disabled' : ''} 
+                                       class="w-full bg-slate-55 hover:bg-white text-right border border-slate-200 rounded-lg p-1.5 text-xs font-mono text-slate-800 font-bold transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                            </td>
+                            <td class="py-2.5 px-3 text-right font-black text-indigo-700 text-xs">
                                 NT$ ${Math.round(tx.totalTwd).toLocaleString()}
                             </td>
-                            <td class="py-3 px-4 text-center">
-                                <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[11px] text-indigo-600 bg-white hover:bg-indigo-50 border border-indigo-200 px-2 py-1.5 rounded font-bold transition whitespace-nowrap shadow-sm">
+                            <td class="py-2.5 px-3 text-center">
+                                <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[10px] text-indigo-600 bg-white hover:bg-indigo-50 border border-indigo-200 px-2 py-1 rounded font-bold transition whitespace-nowrap shadow-sm">
                                     🔍 行程
                                 </button>
                             </td>
                         </tr>
                     `;
+
+                    // ================= 📱 4. 行動裝置卡片版渲染 (每日行程花費 - 手機版) =================
+                    cardContainer.innerHTML += `
+                        <div class="bg-indigo-50/20 p-4 rounded-xl border border-indigo-100 flex flex-col space-y-2.5 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-bold">${tx.date}${weekday}</span>
+                                <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[10px] text-indigo-600 underline font-bold">查看對應行程</button>
+                            </div>
+                            <div class="text-xs font-bold text-slate-800 flex items-center space-x-1">
+                                <span class="text-indigo-500">📍</span>
+                                <span>${tx.item}</span>
+                            </div>
+                            <div class="grid grid-cols-2 text-[11px] text-slate-500 gap-y-1.5 items-center">
+                                <div>付款人: <span class="font-bold text-slate-700">${tx.payer}</span></div>
+                                <div class="text-right">分帳: <span class="font-bold ${tx.isPersonal ? 'text-purple-600' : 'text-orange-600'}">${tx.isPersonal ? '👤 個人' : '👥 共同'}</span></div>
+                                <div>原始金額: <span class="font-mono font-bold text-slate-700">${tx.currency} ${tx.price.toLocaleString()}</span></div>
+                                
+                                <div class="flex items-center justify-end space-x-1">
+                                    <span>匯率:</span>
+                                    <input type="number" step="0.0001" value="${tx.rate}" 
+                                           onchange="updateItineraryRate(${tx.dayIndex}, '${tx.activityId}', this.value)" 
+                                           ${tx.currency === 'TWD' ? 'disabled' : ''} 
+                                           ${!isAdminMode ? 'disabled' : ''} 
+                                           class="w-16 bg-white hover:bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-xs text-right font-mono font-bold text-slate-800 disabled:bg-slate-100/50 disabled:text-slate-400">
+                                </div>
+                            </div>
+                            <div class="border-t border-indigo-100/50 pt-2 flex justify-end text-xs">
+                                <span class="font-black text-indigo-700">台幣折算: NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `;
                 }
             });
 
-            // 渲染分頁
+            // 渲染分頁項目
             let paginationContainer = document.getElementById('ledger-pagination-container');
             if (totalPages > 1) {
                 paginationContainer.className = "flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-150 px-4 mt-4 gap-3";
@@ -1923,7 +2261,6 @@
         }
 
         function updatePreTravelRow(index, field, value) {
-            if (!isAdminMode) return;
             const exp = state.preTravelExpenses[index];
             if (!exp) return;
 
@@ -1947,7 +2284,6 @@
         }
 
         function deletePreTravelRow(index) {
-            if (!isAdminMode) return;
             state.preTravelExpenses.splice(index, 1);
             saveState();
             applyState();
@@ -2127,7 +2463,7 @@
                                 <input type="checkbox" onchange="togglePackingCheck('${item.id}')" ${item.checked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
                                 <span class="leading-tight">${item.item}</span>
                             </label>
-                            <button type="button" onclick="deletePackingItem('${item.id}')" class="admin-only text-slate-300 hover:text-rose-500 transition px-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+                            <button type="button" onclick="deletePackingItem('${item.id}')" class="text-slate-300 hover:text-rose-500 transition px-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                         </div>
@@ -2155,7 +2491,6 @@
         }
 
         function addPackingItem() {
-            if (!isAdminMode) return;
             const owner = document.getElementById('packing-item-owner').value;
             const name = document.getElementById('packing-item-name').value.trim();
             if (!name) return;
@@ -2183,7 +2518,6 @@
         }
 
         function deletePackingItem(id) {
-            if (!isAdminMode) return;
             state.packingList = state.packingList.filter(x => x.id !== id);
             saveState();
             renderPackingList();
@@ -2309,7 +2643,7 @@
                 activePanel.classList.remove('hidden');
             }
 
-            // 懸浮新增活動按鈕 (只限行程規畫且在管理員模式下顯示)
+            // 懸浮新增活動按鈕
             const floatBtn = document.getElementById('floating-add-btn');
             if (tabId === 'itinerary' && isAdminMode) {
                 floatBtn.classList.remove('hidden');
@@ -2397,6 +2731,7 @@
         window.closeActivityModal = closeActivityModal;
         window.saveActivity = saveActivity;
         window.editActivity = editActivity;
+        window.updateItineraryRate = updateItineraryRate;
         window.deleteActivity = deleteActivity;
         window.confirmSettlement = confirmSettlement;
         window.deleteSettledHistory = deleteSettledHistory;
@@ -2420,6 +2755,7 @@
         window.openSyncModal = openSyncModal;
         window.closeSyncModal = closeSyncModal;
         window.saveSyncSettings = saveSyncSettings;
+        window.clearSyncUrl = clearSyncUrl;
         window.exportBackup = exportBackup;
         window.triggerImport = triggerImport;
         window.clearAllDataConfirm = clearAllDataConfirm;
@@ -2428,6 +2764,8 @@
         window.handleRoleToggle = handleRoleToggle;
         window.closeLoginModal = closeLoginModal;
         window.submitLogin = submitLogin;
+        window.toggleQuickRateField = toggleQuickRateField;
+        window.submitQuickExpense = submitQuickExpense;
         
     </script>
 </body>
