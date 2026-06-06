@@ -448,7 +448,7 @@
                     </div>
                 </div>
 
-                <!-- 行李雙欄對齊顯示區 (極致洗鍊 RWD 排版) -->
+                <!-- 行里雙欄對齊顯示區 (極致洗鍊 RWD 排版) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="packing-cards-grid">
                     <!-- 動態生成旅伴行李行李箱大面板 -->
                 </div>
@@ -515,7 +515,7 @@
                     <input type="checkbox" id="login-remember" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
                     <label for="login-remember" class="text-xs text-slate-500 cursor-pointer select-none font-bold">記住帳密，下次自動登入</label>
                 </div>
-                <div id="login-error-msg" class="text-xs text-rose-500 hidden font-bold text-center">帳號或密碼錯誤</div>
+                <div id="login-error-msg" class="text-xs text-rose-500 hidden font-bold text-center leading-relaxed">帳號或密碼錯誤</div>
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeLoginModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-xs hover:bg-slate-50">取消</button>
                     <button type="button" onclick="submitLogin()" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 shadow-md">驗證登入</button>
@@ -1104,6 +1104,7 @@
             const rememberEnabled = document.getElementById('login-remember').checked;
             
             if (!user || !pass) {
+                document.getElementById('login-error-msg').textContent = "請輸入完整帳號密碼";
                 document.getElementById('login-error-msg').classList.remove('hidden');
                 return;
             }
@@ -1115,6 +1116,7 @@
             }
 
             if (!state.googleScriptUrl) {
+                document.getElementById('login-error-msg').textContent = "未設定同步試算表網址，請先使用預設帳密 admin / 123 登入";
                 document.getElementById('login-error-msg').classList.remove('hidden');
                 return;
             }
@@ -1131,11 +1133,14 @@
                 if (result && result.status === "success" && result.verified === true) {
                     loginSuccess(user, pass, rememberEnabled);
                 } else {
+                    const errorMsg = result && result.message ? result.message : "帳號或密碼錯誤";
+                    document.getElementById('login-error-msg').textContent = errorMsg;
                     document.getElementById('login-error-msg').classList.remove('hidden');
                     text.textContent = prevText;
                 }
             } catch (err) {
                 // 當 Google 雲端 API 發生跨網域 CORS 安全阻擋時，退回本機提示並提醒改用預設
+                document.getElementById('login-error-msg').innerHTML = `連線失敗！請確認試算表 Web App 已部署且設定為「所有人(Anyone)」可以存取。<br><span class="text-[10px] text-rose-500">系統提示: 瀏覽器安全性 CORS 阻擋或端點未響應。</span>`;
                 document.getElementById('login-error-msg').classList.remove('hidden');
                 text.textContent = prevText;
             }
@@ -1387,6 +1392,7 @@
             });
         }
 
+        // 行程與後續邏輯維持原本正常運作...
         function selectDay(index) {
             state.activeDayIndex = index;
             saveState(true);
@@ -1534,7 +1540,6 @@
             applyRoleVisibility(); 
         }
 
-        // 天數控制
         function openDayModal(edit = false) {
             if (!isAdminMode) return;
             if (edit) {
@@ -1602,7 +1607,6 @@
             );
         }
 
-        // 行程活動
         function openActivityModal(actId = null) {
             if (!isAdminMode) {
                 showToast("此功能僅限管理員後台模式開啟", "🔒");
@@ -1790,9 +1794,6 @@
             );
         }
 
-
-        // ==================== 2. 財務記帳 & 分帳 ====================
-        
         function toggleQuickRateField(currency) {
             const rateInput = document.getElementById('quick-item-rate');
             if (currency === "TWD") {
@@ -1845,7 +1846,6 @@
             showToast(`記帳成功！已紀錄於當日 ${todayDate}`, "🎉");
         }
 
-        // 動態過濾記帳篩選
         function handleLedgerFilterChange() {
             ledgerFilterType = document.getElementById('filter-ledger-type').value;
             ledgerFilterMember = document.getElementById('filter-ledger-member').value;
@@ -1858,19 +1858,16 @@
                 payments[c] = { sharedTwd: 0, rawKrw: 0 };
             });
 
-            // 💰 用於動態統計看板的變數
             let totalSpentTwd = 0;
             let totalSharedSpentTwd = 0;
             let totalPersonalSpentTwd = 0;
 
-            // A. 行前與個人快速記帳加總
             state.preTravelExpenses.forEach(exp => {
                 const totalCost = (parseFloat(exp.price) || 0) * (parseInt(exp.qty) || 0);
                 const rate = parseFloat(exp.rate) || 1.0;
                 const isPersonal = exp.isPersonal === true;
                 const costInTwd = totalCost * rate;
 
-                // 進行「總支出分析看板」累加
                 totalSpentTwd += costInTwd;
                 if (isPersonal) {
                     totalPersonalSpentTwd += costInTwd;
@@ -1891,7 +1888,6 @@
                 }
             });
 
-            // B. 每日行程費用
             state.days.forEach(day => {
                 day.activities.forEach(act => {
                     if (act.cost && act.cost.payer && act.cost.amount) {
@@ -1900,7 +1896,6 @@
                         const costInTwd = amount * rate;
                         const isPersonal = act.cost.isPersonal === true;
 
-                        // 進行「總支出分析看板」累加
                         totalSpentTwd += costInTwd;
                         if (isPersonal) {
                             totalPersonalSpentTwd += costInTwd;
@@ -1923,12 +1918,10 @@
                 });
             });
 
-            // 🎯 即時渲染「旅程消費統計看板」
             document.getElementById('stats-total-spent').textContent = `NT$ ${Math.round(totalSpentTwd).toLocaleString()}`;
             document.getElementById('stats-shared-spent').textContent = `NT$ ${Math.round(totalSharedSpentTwd).toLocaleString()}`;
             document.getElementById('stats-personal-spent').textContent = `NT$ ${Math.round(totalPersonalSpentTwd).toLocaleString()}`;
 
-            // 渲染團員已付共同款卡片 (分帳)
             const cardsContainer = document.getElementById('companions-payment-cards');
             cardsContainer.innerHTML = "";
             state.companions.forEach(c => {
@@ -1951,7 +1944,6 @@
                 `;
             });
 
-            // 分帳智慧結算（排除個人自付）
             let totalSharedSpent = 0;
             state.companions.forEach(c => {
                 const payData = payments[c];
@@ -2042,7 +2034,6 @@
             renderCombinedDetailsTable();
         }
 
-        // 合併與渲染記帳明細列表 (高度格式統一，前台純文字表格，後台可編輯輸入框，欄位寬度極致適中)
         function renderCombinedDetailsTable() {
             const tbody = document.getElementById('pretravel-table-body');
             const cardContainer = document.getElementById('pretravel-cards-container');
@@ -2052,7 +2043,6 @@
 
             const allTx = [];
 
-            // A. 載入行前費用 / 快速記帳
             state.preTravelExpenses.forEach((exp, idx) => {
                 allTx.push({
                     uniqueId: `pre-${exp.id || idx}`,
@@ -2071,7 +2061,6 @@
                 });
             });
 
-            // B. 載入行程花費
             state.days.forEach((day, dayIdx) => {
                 day.activities.forEach(act => {
                     if (act.cost && act.cost.payer && act.cost.amount) {
@@ -2095,16 +2084,12 @@
                 });
             });
 
-            // 排序 (日期排序)
             allTx.sort((a, b) => a.date.localeCompare(b.date));
 
-            // 🎯 執行動態篩選 (種類與付款人過濾)
             const filteredTx = allTx.filter(tx => {
-                // 付款人過濾
                 if (ledgerFilterMember !== "all" && tx.payer !== ledgerFilterMember) {
                     return false;
                 }
-                // 花費種類過濾
                 if (ledgerFilterType === "shared" && tx.isPersonal === true) {
                     return false;
                 }
@@ -2114,11 +2099,9 @@
                 return true;
             });
 
-            // 🎯 即時渲染小計金額
             const filteredSubtotal = filteredTx.reduce((sum, tx) => sum + tx.totalTwd, 0);
             document.getElementById('filtered-subtotal-twd').textContent = `NT$ ${Math.round(filteredSubtotal).toLocaleString()}`;
 
-            // 分頁處理
             const itemsPerPage = 20;
             const totalPages = Math.ceil(filteredTx.length / itemsPerPage) || 1;
             
@@ -2148,11 +2131,9 @@
                 const isPersonalLabel = tx.isPersonal ? "👤 個人自付" : "👥 分帳";
                 const isPersonalClass = tx.isPersonal ? "text-purple-600 bg-purple-50" : "text-orange-600 bg-orange-50";
 
-                // ================= 💻 1. 桌機版表格渲染 (高格式統一與自適應) =================
                 let rowHTML = "";
 
                 if (isAdminMode) {
-                    // 🔓 後台編輯解鎖狀態
                     if (tx.type === 'pretravel') {
                         rowHTML = `
                             <tr class="border-b border-slate-100 hover:bg-slate-50/50 align-middle">
@@ -2199,7 +2180,6 @@
                             </tr>
                         `;
                     } else {
-                        // 每日行程花費
                         rowHTML = `
                             <tr class="border-b border-slate-100 bg-indigo-50/10 hover:bg-indigo-50/30 align-middle">
                                 <td class="py-2.5 px-3 text-xs font-bold text-indigo-600">${tx.date}</td>
@@ -2228,7 +2208,6 @@
                         `;
                     }
                 } else {
-                    // 🔒 瀏覽者前台模式：全面採取最乾淨、零邊框的「統一純文字表格」渲染，字型完全一致！
                     rowHTML = `
                         <tr class="border-b border-slate-150 hover:bg-slate-50/50 align-middle text-slate-700">
                             <td class="py-3.5 px-3 text-xs font-bold text-slate-500 whitespace-nowrap">${tx.date}</td>
@@ -2253,7 +2232,6 @@
 
                 tbody.innerHTML += rowHTML;
 
-                // ================= 📱 2. 行動裝置卡片版渲染 (自適應不滾動) =================
                 let cardHTML = "";
 
                 if (isAdminMode) {
@@ -2358,7 +2336,6 @@
                 cardContainer.innerHTML += cardHTML;
             });
 
-            // 渲染分頁項目
             let paginationContainer = document.getElementById('ledger-pagination-container');
             if (totalPages > 1) {
                 paginationContainer.className = "flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-150 px-4 mt-4 gap-3";
@@ -2394,7 +2371,6 @@
             showToast(`已跳轉至 Day ${dayIndex + 1} 行程計畫`, "📍");
         }
 
-        // 行前費用增刪 (自動代入當天日期)
         function addPreTravelRow() {
             if (!isAdminMode) return;
             const todayDate = new Date().toISOString().split('T')[0];
@@ -2464,8 +2440,6 @@
             showToast("已撤銷此筆分帳！", "🔄");
         }
 
-
-        // ==================== 3. 票券憑證管理 ====================
         function renderVouchers() {
             const grid = document.getElementById('voucher-grid');
             grid.innerHTML = "";
@@ -2591,8 +2565,6 @@
             );
         }
 
-
-        // ==================== 4. 行李清單 (左右雙欄大行李面板 RWD 優化) ====================
         function renderPackingList() {
             const container = document.getElementById('packing-cards-grid');
             container.innerHTML = "";
@@ -2685,8 +2657,6 @@
             renderPackingList();
         }
 
-
-        // ==================== 5. 旅行注意事項 ====================
         function renderNotesList() {
             const container = document.getElementById('notes-container');
             container.innerHTML = "";
@@ -2781,8 +2751,6 @@
             );
         }
 
-
-        // ==================== 版面切換 ====================
         function switchTab(tabId) {
             state.activeTab = tabId;
             saveState(true); 
@@ -2817,8 +2785,6 @@
             else if (tabId === 'notes') renderNotesList();
         }
 
-
-        // ==================== 備份與控制功能 ====================
         function exportBackup() {
             if (!isAdminMode) return;
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
