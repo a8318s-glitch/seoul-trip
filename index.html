@@ -189,7 +189,7 @@
             <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 p-5 rounded-2xl shadow-lg text-white">
                 <div class="flex items-center space-x-2 mb-3">
                     <span class="text-xl">⚡</span>
-                    <h3 class="text-base font-bold">免登入快速記帳</h3>
+                    <h3 class="text-base font-bold">快速記帳</h3>
                     <span class="text-[10px] bg-indigo-450 px-2 py-0.5 rounded-full border border-indigo-300">可直接輸入</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end text-slate-800">
@@ -336,7 +336,7 @@
                         </span>
                         <!-- 篩選花費種類 -->
                         <select id="filter-ledger-type" onchange="handleLedgerFilterChange()" class="bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                            <option value="all">📁 總花費 (分帳 + 個人自付)</option>
+                            <option value="all">📁 總花費 (分帳 + 個人)</option>
                             <option value="shared">👥 僅顯示「分帳」項目</option>
                             <option value="personal">👤 僅顯示「個人」項目</option>
                         </select>
@@ -358,7 +358,7 @@
                         <thead>
                             <tr class="bg-slate-50/70 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider select-none">
                                 <th class="py-3 px-3 w-[12%]">日期</th>
-                                <th class="py-3 px-3 w-[20%]">消費品項</th>
+                                <th class="py-3 px-3 w-[20%]">項目</th>
                                 <th class="py-3 px-3 w-[10%]">付款人</th>
                                 <th class="py-3 px-3 w-[12%]">分帳類型</th>
                                 <th class="py-3 px-3 w-[6%] text-center">數量</th>
@@ -1472,7 +1472,7 @@
                 if (act.cost && (act.cost.payer && act.cost.amount)) {
                     const currencySymbol = act.cost.currency === "KRW" ? "₩" : "NT$";
                     const rateText = act.cost.currency !== "TWD" ? ` (匯率 ${act.cost.rate || 1})` : "";
-                    const splitLabel = act.cost.isPersonal ? "👤 個人自付" : "👥 分帳";
+                    const splitLabel = act.cost.isPersonal ? "👤 個人" : "👥 分帳";
                     const splitClass = act.cost.isPersonal ? "bg-purple-50 text-purple-700 border-purple-100" : "bg-orange-50 text-orange-700 border-orange-100";
                     
                     costHTML = `
@@ -1813,7 +1813,7 @@
             const rate = parseFloat(document.getElementById('quick-item-rate').value) || 1.0;
 
             if (!item) {
-                showToast("請填寫消費品項名稱！", "⚠️");
+                showToast("請填寫消費項目名稱！", "⚠️");
                 return;
             }
             if (isNaN(price) || price <= 0) {
@@ -2125,7 +2125,7 @@
                     payerOptions += `<option value="${c}" ${tx.payer === c ? "selected" : ""}>${c}</option>`;
                 });
 
-                const isPersonalLabel = tx.isPersonal ? "👤 個人自付" : "👥 分帳";
+                const isPersonalLabel = tx.isPersonal ? "👤 個人" : "👥 分帳";
                 const isPersonalClass = tx.isPersonal ? "text-purple-600 bg-purple-50" : "text-orange-600 bg-orange-50";
 
                 let rowHTML = "";
@@ -2148,7 +2148,7 @@
                                 <td class="py-2.5 px-3">
                                     <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" class="${selectClass}">
                                         <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 分帳</option>
-                                        <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人自付</option>
+                                        <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人</option>
                                     </select>
                                 </td>
                                 <td class="py-2.5 px-3 text-center">
@@ -2243,7 +2243,7 @@
                                 </div>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div class="col-span-2">
-                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">消費品項</label>
+                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">消費項目</label>
                                         <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" class="${inputClass}">
                                     </div>
                                     <div>
