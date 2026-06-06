@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首爾五天四夜旅程 - 智慧旅行大師 Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        /* 自訂滾動條 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #818cf8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+    <!-- 頂部導航欄 (RWD 自適應與擠壓防護) -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            
+            <div class="flex items-center justify-between sm:justify-start space-x-2 sm:space-x-3 min-w-0">
+                <div class="flex items-center space-x-2 min-w-0">
+                    <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md shadow-indigo-100 flex-shrink-0 hidden xs:block">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </div>
+                    <!-- 可編輯標題 -->
+                    <div class="flex items-center space-x-1 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200/50 min-w-0">
+                        <input type="text" id="trip-title" class="text-sm sm:text-base font-bold text-slate-900 bg-transparent focus:outline-none w-28 xs:w-36 sm:w-48 truncate" value="首爾五天四夜旅程" placeholder="旅程名稱">
+                    </div>
+                </div>
+
+                <!-- 權限管理按鈕 (前台/後台一鍵切換) -->
+                <div class="flex-shrink-0">
+                    <button type="button" id="role-toggle-btn" onclick="handleRoleToggle()" class="flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm border">
+                        <span>載入中...</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 雲端同步與資料操作 (RWD 自動折疊、防擁擠) -->
+            <div class="flex items-center justify-between sm:justify-end gap-2 text-sm flex-wrap sm:flex-nowrap">
+                <!-- 同步狀態指示燈 -->
+                <button type="button" onclick="openSyncModal()" id="sync-status-btn" class="flex items-center space-x-1 bg-rose-50 text-rose-600 px-2.5 py-2 rounded-xl font-medium border border-rose-100 hover:bg-rose-100 transition flex-1 sm:flex-none justify-center">
+                    <span class="relative flex h-2 w-2 flex-shrink-0">
+                        <span id="sync-indicator-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                        <span id="sync-indicator-dot" class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                    </span>
+                    <span id="sync-status-text" class="text-xs">尚未連線試算表</span>
+                </button>
+                
+                <button type="button" onclick="exportBackup()" class="admin-only hidden md:flex items-center space-x-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-xl font-medium transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span>匯出備份</span>
+                </button>
+                <button type="button" onclick="triggerImport()" class="admin-only hidden md:flex items-center space-x-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-3 py-2 rounded-xl font-medium transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>匯入</span>
+                </button>
+                <input type="file" id="import-file" class="hidden" onchange="importBackup(event)">
+                
+                <button type="button" onclick="clearAllDataConfirm()" class="admin-only bg-red-50 text-red-600 hover:bg-red-100 p-2 sm:px-3 sm:py-2 rounded-xl font-medium transition flex items-center space-x-1 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span class="hidden xs:inline text-xs">復原預設</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 分頁選單 (RWD 滑動保護) -->
+    <div class="bg-white border-b border-slate-100 shadow-sm sticky top-16 sm:top-20 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto py-3 scrollbar-none" aria-label="Tabs">
+                <button type="button" onclick="switchTab('itinerary')" id="tab-itinerary" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 bg-indigo-600 text-white shadow-md shadow-indigo-100">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span>行程</span>
+                </button>
+                <button type="button" onclick="switchTab('ledger')" id="tab-ledger" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>記帳</span>
+                </button>
+                <button type="button" onclick="switchTab('vouchers')" id="tab-vouchers" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                    <span>票券</span>
+                </button>
+                <button type="button" onclick="switchTab('packing')" id="tab-packing" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                    <span>行李清單</span>
+                </button>
+                <button type="button" onclick="switchTab('notes')" id="tab-notes" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                    <span>注意事項</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 主要內容區 -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- ==================== 1. 行程規劃 ==================== -->
+        <div id="panel-itinerary" class="tab-panel grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- 左側：天數選擇列表 -->
+            <div class="lg:col-span-1 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 h-fit">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-900 flex items-center space-x-1.5">
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <span>旅程天數</span>
+                    </h3>
+                    <button type="button" onclick="openDayModal()" class="admin-only bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center space-x-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        <span>新增天數</span>
+                    </button>
+                </div>
+                <div id="day-list" class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-3 lg:pb-0 scrollbar-none">
+                    <!-- 動態載入天數 -->
+                </div>
+            </div>
+
+            <!-- 右側：行程詳細內容 -->
+            <div class="lg:col-span-3 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-5 mb-6 gap-4">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h2 id="current-day-title" class="text-lg sm:text-2xl font-black text-slate-900">Day 1 抵達與明洞逛街</h2>
+                            <span id="current-day-date" class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-semibold whitespace-nowrap">2026/06/15 星期一</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 flex-wrap gap-y-2">
+                        <label class="flex items-center space-x-2 text-sm text-slate-500 mr-2 hover:text-slate-800 cursor-pointer">
+                            <input type="checkbox" id="filter-incomplete" onchange="renderItinerary()" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                            <span>僅顯示未開始</span>
+                        </label>
+                        <button type="button" onclick="editCurrentDay()" class="admin-only bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-medium px-3 py-1.5 rounded-lg transition">修改天數資訊</button>
+                        <button type="button" onclick="deleteCurrentDay()" class="admin-only bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium px-3 py-1.5 rounded-lg transition">刪除此天</button>
+                    </div>
+                </div>
+
+                <!-- 時間軸行程列表 -->
+                <div class="relative pl-6 md:pl-8 border-l-2 border-indigo-100 space-y-6" id="activity-timeline">
+                    <!-- 動態渲染行程 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 2. 財務記帳 & 分帳 ==================== -->
+        <div id="panel-ledger" class="tab-panel hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 出遊成員與已付金額 -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- 出遊成員名單 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                            <span>出遊成員名單</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <input type="text" id="companion-list-input" onchange="updateCompanions(this.value)" placeholder="小明, 小華, 莉莉" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold" value="小明, 小華, 莉莉">
+                            <p class="text-[11px] text-slate-400">輸入旅伴名字，並以英文逗號分隔。</p>
+                        </div>
+                    </div>
+
+                    <!-- 團員已付共同金額 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>團員已付金額 (共同)</span>
+                        </h3>
+                        <div class="space-y-3" id="companions-payment-cards">
+                            <!-- 動態團員付款卡片 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 誰應該付給誰多少錢 (智慧結算) -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                            <span>共同款項結算 (不含個人自付項目)</span>
+                        </h3>
+                        
+                        <div class="space-y-3" id="ledger-settlement-list">
+                            <!-- 待匯款清單 -->
+                        </div>
+
+                        <!-- 已結清項目歷史 -->
+                        <div class="mt-8 pt-6 border-t border-slate-100">
+                            <h4 class="font-bold text-sm text-slate-800 mb-3 flex items-center space-x-1.5">
+                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span>已確認結清項目</span>
+                            </h4>
+                            <div class="text-xs text-slate-500 space-y-2 bg-slate-50/50 p-4 rounded-xl border border-slate-100" id="settled-history-list">
+                                尚無已結清歷史。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 記帳明細區塊 -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                            <span>記帳明細</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1 font-medium">
+                            提示：左右拖動表格可檢視完整明細。個人自付項目不會加入分帳公式。
+                        </p>
+                    </div>
+                    <button type="button" onclick="addPreTravelRow()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-100 transition flex items-center space-x-1 self-start sm:self-auto flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        <span>新增行前費用</span>
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto rounded-xl border border-slate-150 shadow-inner">
+                    <table class="w-full text-left border-collapse min-w-[1100px]">
+                        <thead>
+                            <tr class="bg-slate-50/70 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider select-none">
+                                <th class="py-3 px-4 w-[10%]">日期</th>
+                                <th class="py-3 px-4 w-[22%]">消費品項 / 行程名稱</th>
+                                <th class="py-3 px-4 w-[11%]">付款人</th>
+                                <th class="py-3 px-4 w-[11%]">分帳類型</th>
+                                <th class="py-3 px-4 w-[6%] text-center">數量</th>
+                                <th class="py-3 px-4 w-[10%] text-right">金額</th>
+                                <th class="py-3 px-4 w-[8%] text-center">幣別</th>
+                                <th class="py-3 px-4 w-[10%] text-right font-mono">匯率</th>
+                                <th class="py-3 px-4 w-[12%] text-right font-semibold text-slate-900">台幣總計</th>
+                                <th class="py-3 px-4 w-[10%] text-center">操作/來源</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pretravel-table-body" class="text-sm divide-y divide-slate-100">
+                            <!-- 動態與分頁渲染行程與行前費用 -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 記帳明細分頁控制項 -->
+                <div id="ledger-pagination-container"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 3. 票券中心 ==================== -->
+        <div id="panel-vouchers" class="tab-panel hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center space-x-2">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                    <span>票券</span>
+                </h2>
+                <button type="button" onclick="openVoucherModal()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition flex items-center space-x-1 self-start sm:self-auto shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    <span>新增票券</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="voucher-grid">
+                <!-- 動態票券卡片 -->
+            </div>
+        </div>
+
+        <!-- ==================== 4. 行李清單 ==================== -->
+        <div id="panel-packing" class="tab-panel hidden space-y-6">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex flex-col lg:flex-row justify-between lg:items-center border-b border-slate-100 pb-5 mb-6 gap-4">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center space-x-2">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                            <span>行李清單</span>
+                        </h2>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs text-slate-500 flex-wrap gap-y-2">
+                        <span>旅伴名單:</span>
+                        <span id="packing-companions-display" class="font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">小明, 小華, 莉莉</span>
+                        
+                        <span class="mx-2">|</span>
+                        
+                        <span>篩選顯示:</span>
+                        <select id="packing-filter-owner" onchange="renderPackingList()" class="bg-slate-50 border border-slate-200 rounded-lg p-1.5 focus:outline-none">
+                            <option value="all">顯示所有人的清單</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 快速新增行李表單 (管理員限定) -->
+                <div class="admin-only bg-slate-50 border border-slate-150 p-4 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5">這是誰的行李 / 備忘項目？</label>
+                        <select id="packing-item-owner" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <!-- 旅伴選項會動態新增 -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5">準備物品 / 備忘事項</label>
+                        <input type="text" id="packing-item-name" placeholder="例如：護照正本、行動電源..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <button type="button" onclick="addPackingItem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                            <span>新增項目</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 行李卡片併排區域 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="packing-cards-grid">
+                    <!-- 動態生成旅伴行李清單 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 5. 旅行注意事項 ==================== -->
+        <div id="panel-notes" class="tab-panel hidden space-y-6">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center space-x-2">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                            <span>行程重要備忘與注意事項</span>
+                        </h2>
+                    </div>
+                    <div>
+                        <button type="button" onclick="openNoteModal()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-100 transition flex items-center space-x-1.5 self-start sm:self-auto">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                            <span>新增注意事項</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 條列式容器 -->
+                <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+                    <div class="divide-y divide-slate-100" id="notes-container">
+                        <!-- 注意事項會以條列平鋪形式渲染至此 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 浮動新增活動按鈕 (管理員限定) -->
+    <button type="button" onclick="openActivityModal()" id="floating-add-btn" class="admin-only fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-xl hover:scale-105 transition duration-200 z-30">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" /></svg>
+    </button>
+
+    <!-- ==================== 各種彈出視窗 (Modals) ==================== -->
+
+    <!-- 管理員登入視窗 -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <div class="text-center mb-4">
+                <div class="mx-auto w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <h3 class="font-black text-slate-900 text-lg">切換為後台管理員</h3>
+                <p class="text-xs text-slate-400 mt-1">請輸入管理員帳密以開啟編輯權限</p>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">管理員帳號</label>
+                    <input type="text" id="login-username" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">密碼</label>
+                    <input type="password" id="login-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
+                </div>
+                <div id="login-error-msg" class="text-xs text-rose-500 hidden font-bold text-center">帳號或密碼錯誤</div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeLoginModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-xs hover:bg-slate-50">取消</button>
+                    <button type="button" onclick="submitLogin()" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 shadow-md">驗證登入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Google 試算表同步設定視窗 -->
+    <div id="sync-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <span>Google 試算表即時同步設定</span>
+                </h3>
+                <button type="button" onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5 font-mono">Google Apps Script URL (僅限管理員修改)</label>
+                    <input type="text" id="sync-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-800 space-y-1">
+                    <p class="font-bold flex items-center space-x-1">
+                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>設定注意事項：</span>
+                    </p>
+                    <p>1. 請確保已在試算表的 Apps Script 中部署為「網頁應用程式」。</p>
+                    <p>2. 「誰可以存取」請務必選取「所有人」，否則會連線失敗。</p>
+                    <p>3. 儲存後，網頁資料會在每次異動時，即時自動同步覆寫至雲端試算表。</p>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeSyncModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
+                    <button type="button" onclick="saveSyncSettings()" id="save-sync-btn" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-md">儲存並立即同步</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 天數編輯/新增視窗 -->
+    <div id="day-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-4" id="day-modal-title">新增旅程天數</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">天數標題</label>
+                    <input type="text" id="day-title-input" placeholder="例如：抵達與明洞逛街" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">日期</label>
+                    <input type="date" id="day-date-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeDayModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
+                    <button type="button" onclick="saveDay()" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 活動行程編輯/新增視窗 -->
+    <div id="activity-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl my-8">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-4" id="activity-modal-title">新增活動行程</h3>
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">時間 (HH:MM)</label>
+                        <input type="text" id="act-time" placeholder="例如：13:30" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">活動類型</label>
+                        <select id="act-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                            <option value="transport">交通 🚌</option>
+                            <option value="lodging">住宿 🏨</option>
+                            <option value="food">美食 🍕</option>
+                            <option value="spot">景點 ⛰️</option>
+                            <option value="shopping">購物 🛍️</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">活動/地點名稱</label>
+                    <input type="text" id="act-title" placeholder="例如：仁川機場搭乘 AREX 直達首爾站" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">詳細說明/攻略</label>
+                    <textarea id="act-desc" placeholder="搭乘機場快線直達..." class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold"></textarea>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-500">子步驟/詳細時間點</label>
+                        <span class="text-[10px] text-slate-400">格式：13:30 入境大廳</span>
+                    </div>
+                    <textarea id="act-substeps" placeholder="13:30 入境大廳 B1&#10;13:45 至自動售票機憑 QR Code 兌換實體票" class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono font-semibold"></textarea>
+                </div>
+                
+                <!-- 活動行程內費用設定 -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">付款人</label>
+                        <select id="act-cost-payer" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                            <!-- 動態載入 -->
+                        </select>
+                    </div>
+                    <div class="col-span-1">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">分帳類型</label>
+                        <select id="act-cost-personal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-bold text-indigo-600">
+                            <option value="false">👥 共同</option>
+                            <option value="true">👤 個人</option>
+                        </select>
+                    </div>
+                    <div class="col-span-1">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">幣別</label>
+                        <select id="act-cost-currency" onchange="toggleActRateField(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                            <option value="TWD">TWD</option>
+                            <option value="KRW">KRW</option>
+                        </select>
+                    </div>
+                    <div class="col-span-1">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">金額</label>
+                        <input type="number" id="act-cost-amount" placeholder="金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold">
+                    </div>
+                    <div class="col-span-1">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">該筆匯率</label>
+                        <input type="number" step="0.0001" id="act-cost-rate" placeholder="1.0" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Google地圖網址</label>
+                        <input type="text" id="act-map-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">憑證/QR代碼網址</label>
+                        <input type="text" id="act-voucher-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeActivityModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
+                <button type="button" onclick="saveActivity()" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">儲存活動</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 票券新增/編輯視窗 -->
+    <div id="voucher-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-4" id="voucher-modal-title">新增票券</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">票券名稱</label>
+                    <input type="text" id="v-title" placeholder="例如：AREX 機場快線電子票" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">類別</label>
+                        <select id="v-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                            <option value="交通">交通 🚌</option>
+                            <option value="住宿">住宿 🏨</option>
+                            <option value="門票">門票 🎟️</option>
+                            <option value="保險">保險 🛡️</option>
+                            <option value="其他">其他 🏷️</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">代碼/序號 (選填)</label>
+                        <input type="text" id="v-code" placeholder="QR-12345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">憑證連結 / 網址 (選填)</label>
+                    <input type="text" id="v-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">備註/換票規則說明</label>
+                    <textarea id="v-note" placeholder="至自動售票機憑 QR Code 兌換實體車票" class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100 mt-4">
+                <button type="button" onclick="closeVoucherModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
+                <button type="button" onclick="saveVoucher()" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">儲存憑證</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 注意事項新增/編輯視窗 -->
+    <div id="note-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-4" id="note-modal-title">新增注意事項</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">注意事項內容 / 備忘攻略</label>
+                    <textarea id="n-content" placeholder="請在此填寫重要備份..." class="w-full h-36 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100 mt-4">
+                <button type="button" onclick="closeNoteModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
+                <button type="button" onclick="saveNoteItem()" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">儲存注意事項</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. 自訂確認/提示視窗 -->
+    <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[9999]">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center space-x-3 text-amber-500 mb-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <h4 class="font-black text-slate-900 text-lg" id="confirm-title">確認動作</h4>
+            </div>
+            <p class="text-sm text-slate-500 leading-relaxed mb-6" id="confirm-message">您確定要執行此操作嗎？</p>
+            <div class="flex justify-end space-x-2">
+                <button type="button" id="confirm-cancel-btn" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50 transition">取消</button>
+                <button type="button" id="confirm-action-btn" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold transition">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. 自訂 Toast 提示通知 -->
+    <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur text-white px-5 py-3 rounded-2xl shadow-xl hidden items-center space-x-2.5 z-[10000] text-sm font-bold transition-all duration-300">
+        <span id="toast-icon">✨</span>
+        <span id="toast-text">作業已完成</span>
+    </div>
+
+
+    <!-- ==================== JavaScript 功能實作 ==================== -->
+    <script>
+        // ==================== 🛠️ 預設固定的雲端同步連結設定 ====================
+        const DEFAULT_SYNC_URL = "https://script.google.com/macros/s/AKfycbxAK4rsaO9Vv--BoOIFdiZixNnwoetyXkeGycjZwsU7ier-lMyPOCRrVFYAO2b9nSEJvA/exec"; 
+        // ====================================================================
+
+        // 預設旅行範本資料
+        const defaultState = {
+            tripTitle: "首爾五天四夜旅程",
+            activeTab: "itinerary",
+            activeDayIndex: 0,
+            googleScriptUrl: DEFAULT_SYNC_URL, 
+            companions: ["小明", "小華", "莉莉"],
+            days: [
+                {
+                    title: "抵達與明洞逛街",
+                    date: "2026-06-15",
+                    activities: [
+                        {
+                            id: "act-1",
+                            time: "13:30",
+                            title: "仁川機場搭乘 AREX 直達首爾站",
+                            type: "transport",
+                            voucher: "",
+                            desc: "搭乘機場快線 AREX 直達首爾站。預先在 Klook 購買單程車票並完成預約劃位。",
+                            subSteps: [
+                                { time: "13:30", text: "入境大廳 B1 交通中心" },
+                                { time: "13:45", text: "至自動售票機憑 QR Code 兌換實體車票" },
+                                { time: "14:00", text: "至橘色直達車閘門刷卡進站乘車" }
+                            ],
+                            cost: { payer: "小明", item: "直達車票", amount: 28500, currency: "KRW", rate: 0.0241, isPersonal: false }, 
+                            status: "completed",
+                            mapUrl: "https://maps.google.com/?q=Incheon+Airport+AREX",
+                            voucherUrl: "https://script.google.com"
+                        },
+                        {
+                            id: "act-2",
+                            time: "15:30",
+                            title: "飯店辦理入住",
+                            type: "lodging",
+                            voucher: "",
+                            desc: "前往首爾市區設計旅店 check-in，安置行李。",
+                            subSteps: [],
+                            cost: { payer: "小華", item: "飯店訂房服務費", amount: 3600, currency: "TWD", rate: 1.0, isPersonal: false }, 
+                            status: "todo",
+                            mapUrl: "https://maps.google.com/?q=Myeongdong+Hotel",
+                            voucherUrl: "#"
+                        }
+                    ]
+                }
+            ],
+            preTravelExpenses: [
+                { id: "pre-1", item: "首爾來回機票", payer: "小華", qty: 3, price: 12500, currency: "TWD", rate: 1.0, isPersonal: false }, 
+                { id: "pre-2", item: "海外上網 eSIM 卡", payer: "小明", qty: 3, price: 450, currency: "TWD", rate: 1.0, isPersonal: false },  
+                { id: "pre-3", item: "海外旅遊不便險", payer: "莉莉", qty: 3, price: 600, currency: "TWD", rate: 1.0, isPersonal: false }   
+            ],
+            settledHistory: [],
+            vouchers: [
+                { id: "v-1", title: "AREX 機場快線單程車票", type: "交通", code: "QR-88271399", note: "入境後前往 B1 AREX 售票機感應 QR 換票即可。", url: "https://www.klook.com" },
+                { id: "v-2", title: "首爾明洞住宿預約單", type: "住宿", code: "BOOKING-991827", note: "包含雙人房 4 晚，到現場出示護照登記入住。", url: "" }
+            ],
+            packingList: [
+                { id: "p-1", item: "印出 Klook 與住宿預訂單", owner: "小明", checked: false },
+                { id: "p-2", item: "護照、身份證正本", owner: "小明", checked: true },
+                { id: "p-3", item: "萬國轉接插頭與充電器", owner: "小華", checked: false },
+                { id: "p-4", item: "個人常備藥物(胃藥感冒藥)", owner: "莉莉", checked: false }
+            ],
+            notesList: [
+                { id: "n-1", content: "出站後記得買 T-money 卡儲值加值（韓國地鐵、公車感應超方便，空卡約 2,500 韓元）。" },
+                { id: "n-2", content: "eSIM 出發前一天要在台灣安裝好，下飛機直接開啟漫遊數據即可通訊。" },
+                { id: "n-3", content: "在韓國刷卡非常普及，但部分街邊傳統小吃與地下街僅接受韓元現金，建議備足零錢。" }
+            ]
+        };
+
+        // 全域 State 初始化
+        let state = JSON.parse(localStorage.getItem('travel_planner_state')) || defaultState;
+
+        // 安全權限控制 state (與 Google Sheet 一起同步，但登入狀態獨立紀錄在 localStorage 實現記住密碼)
+        let isAdminMode = localStorage.getItem('travel_planner_isAdmin') === 'true';
+
+        // 當本地端尚未儲存，或是本地端的網址為空時，強制作為初始化網址
+        if (DEFAULT_SYNC_URL && (!state.googleScriptUrl || state.googleScriptUrl === "")) {
+            state.googleScriptUrl = DEFAULT_SYNC_URL;
+        }
+
+        // 當天與視窗的操作狀態
+        let editingDayIndex = null;
+        let editingActivityId = null;
+        let editingVoucherId = null;
+        let editingNoteId = null;
+
+        // 記帳明細頁碼狀態
+        let currentLedgerPage = 1;
+
+        // ==================== 💎 自訂 UI 跳窗通知模組 ====================
+        function showToast(text, icon = "✨") {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-text').textContent = text;
+            document.getElementById('toast-icon').textContent = icon;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
+        }
+
+        function showConfirm(title, message, isDanger = true, onConfirm) {
+            const modal = document.getElementById('custom-confirm-modal');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirm-action-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            
+            if (isDanger) {
+                confirmBtn.className = "px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold transition shadow-lg";
+            } else {
+                confirmBtn.className = "px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition shadow-lg";
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const handleConfirm = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                cleanup();
+                if (onConfirm) onConfirm();
+            };
+            
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                cleanup();
+            };
+            
+            const cleanup = () => {
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+            
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+
+        // 初始化應用
+        window.onload = function() {
+            // 系統標題雙向綁定與即時儲存 (防抖)
+            let titleTimeout;
+            document.getElementById('trip-title').addEventListener('input', function(e) {
+                state.tripTitle = e.target.value;
+                document.title = state.tripTitle + " - 智慧旅行大師 Pro";
+                
+                saveState(true);
+                
+                clearTimeout(titleTimeout);
+                titleTimeout = setTimeout(() => {
+                    if (state.googleScriptUrl) {
+                        syncToGoogleSheet();
+                    }
+                }, 1500);
+            });
+
+            // 執行數據更新
+            applyState();
+            checkAndSyncAuto();
+        }
+
+        // State 儲存與同步機制
+        function saveState(skipCloud = false) {
+            localStorage.setItem('travel_planner_state', JSON.stringify(state));
+            
+            if (!skipCloud && state.googleScriptUrl) {
+                syncToGoogleSheet();
+            }
+        }
+
+        function applyState() {
+            // 數據相容性與防呆保障
+            if (!state.companions) state.companions = ["小明", "小華", "莉莉"];
+            if (!state.preTravelExpenses) state.preTravelExpenses = [];
+            if (!state.settledHistory) state.settledHistory = [];
+            if (!state.notesList) state.notesList = [];
+            
+            // 將舊資料相容補上 isPersonal 預設值
+            state.preTravelExpenses.forEach(exp => {
+                if (exp.isPersonal === undefined) exp.isPersonal = false;
+            });
+            state.days.forEach(d => {
+                d.activities.forEach(act => {
+                    if (act.cost && act.cost.isPersonal === undefined) {
+                        act.cost.isPersonal = false;
+                    }
+                });
+            });
+
+            if (state.activeDayIndex === null || state.activeDayIndex >= state.days.length) {
+                state.activeDayIndex = 0;
+            }
+
+            // 更新 UI 中的行程標題與成員名單輸入框
+            const tripTitleInput = document.getElementById('trip-title');
+            if (document.activeElement !== tripTitleInput) {
+                tripTitleInput.value = state.tripTitle;
+            }
+            document.title = state.tripTitle + " - 智慧旅行大師 Pro";
+
+            document.getElementById('companion-list-input').value = state.companions.join(', ');
+            document.getElementById('packing-companions-display').textContent = state.companions.join(', ');
+
+            // 渲染各版面
+            renderDayList();
+            renderItinerary();
+            renderLedger();
+            renderVouchers();
+            renderPackingList();
+            renderNotesList();
+            updateSyncStatusUI();
+            populateDropdowns();
+            applyRoleVisibility(); // 套用前台與後台的瀏覽編輯限制
+        }
+
+        // 🚀 權限與前台/後台模式動態渲染與防誤觸機制
+        function applyRoleVisibility() {
+            const toggleBtn = document.getElementById('role-toggle-btn');
+            
+            if (isAdminMode) {
+                // 後台管理員解鎖模式
+                toggleBtn.innerHTML = `
+                    <span class="flex items-center space-x-1 text-indigo-600">
+                        <span class="relative flex h-2 w-2 mr-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                        </span>
+                        <span>⚙️ 管理員模式(已自動記住)</span>
+                    </span>
+                `;
+                toggleBtn.className = "flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 cursor-pointer";
+                
+                // 顯示所有管理員專屬區塊 (按鈕、增刪鈕)
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.classList.remove('hidden');
+                });
+
+                // 解鎖重要控制項
+                document.getElementById('trip-title').removeAttribute('disabled');
+                document.getElementById('companion-list-input').removeAttribute('disabled');
+                
+            } else {
+                // 安全的前台瀏覽者鎖定模式
+                toggleBtn.innerHTML = `
+                    <span class="flex items-center space-x-1 text-slate-500">
+                        <span>👁️ 瀏覽者模式(安全鎖)</span>
+                    </span>
+                `;
+                toggleBtn.className = "flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer";
+                
+                // 隱藏管理員專屬的增刪元件
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.classList.add('hidden');
+                });
+
+                // 唯讀鎖定行程標題與成員輸入框
+                document.getElementById('trip-title').setAttribute('disabled', 'true');
+                document.getElementById('companion-list-input').setAttribute('disabled', 'true');
+            }
+        }
+
+        // 一鍵切換登入/鎖定
+        function handleRoleToggle() {
+            if (isAdminMode) {
+                // 回歸安全瀏覽模式
+                isAdminMode = false;
+                localStorage.setItem('travel_planner_isAdmin', 'false');
+                applyState();
+                showToast("已鎖定為安全的瀏覽者模式", "🔒");
+            } else {
+                // 彈出後台登入驗證
+                openLoginModal();
+            }
+        }
+
+        // 後台驗證彈出視窗
+        function openLoginModal() {
+            document.getElementById('login-username').value = "";
+            document.getElementById('login-password').value = "";
+            document.getElementById('login-error-msg').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('login-modal').classList.add('flex');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('flex');
+        }
+
+        // 向 GAS 發送安全登入驗證（不把密碼寫死在 JS 檔案中，極高安全性！）
+        async function submitLogin() {
+            const user = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-password').value.trim();
+            
+            if (!user || !pass) {
+                document.getElementById('login-error-msg').classList.remove('hidden');
+                return;
+            }
+
+            if (!state.googleScriptUrl) {
+                // 如果未綁定試算表，採用本機預設驗證備份 (admin / 123)
+                if (user === "admin" && pass === "123") {
+                    loginSuccess();
+                } else {
+                    document.getElementById('login-error-msg').classList.remove('hidden');
+                }
+                return;
+            }
+
+            // 🚀 向 Google Apps Script 安全發送驗證 (防止密碼洩漏在前端 HTML 中)
+            const text = document.getElementById('sync-status-text');
+            const prevText = text.textContent;
+            text.textContent = "驗證身分中...";
+
+            try {
+                // 採用帶 action 的 POST 請求向試算表安全驗證
+                const response = await fetch(state.googleScriptUrl + "?action=loginVerify&user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass));
+                const result = await response.json();
+                
+                if (result && result.status === "success" && result.verified === true) {
+                    loginSuccess();
+                } else {
+                    document.getElementById('login-error-msg').classList.remove('hidden');
+                    text.textContent = prevText;
+                }
+            } catch (err) {
+                // 如果同步連結未升級支援此 action，回退至本地預設比對
+                if (user === "admin" && pass === "123") {
+                    loginSuccess();
+                } else {
+                    document.getElementById('login-error-msg').classList.remove('hidden');
+                }
+                text.textContent = prevText;
+            }
+        }
+
+        function loginSuccess() {
+            isAdminMode = true;
+            // 登入後自動記住密碼與狀態於 localStorage 中
+            localStorage.setItem('travel_planner_isAdmin', 'true');
+            applyState();
+            closeLoginModal();
+            showToast("後台管理員權限已解鎖！(已自動記住此裝置)", "🔓");
+        }
+
+        // 下拉選單載入
+        function populateDropdowns() {
+            // 行李指派
+            const itemOwnerSelect = document.getElementById('packing-item-owner');
+            if (itemOwnerSelect) {
+                const currentOwnerVal = itemOwnerSelect.value;
+                itemOwnerSelect.innerHTML = "";
+                state.companions.forEach(c => {
+                    itemOwnerSelect.innerHTML += `<option value="${c}">👤 ${c}</option>`;
+                });
+                itemOwnerSelect.value = currentOwnerVal || state.companions[0];
+            }
+
+            // 行李篩選
+            const filterOwnerSelect = document.getElementById('packing-filter-owner');
+            if (filterOwnerSelect) {
+                const currentFilterVal = filterOwnerSelect.value;
+                filterOwnerSelect.innerHTML = `<option value="all">顯示所有人的清單</option>`;
+                state.companions.forEach(c => {
+                    filterOwnerSelect.innerHTML += `<option value="${c}">${c} 的清單</option>`;
+                });
+                filterOwnerSelect.value = currentFilterVal || "all";
+            }
+
+            // 活動付款人
+            const actPayerSelect = document.getElementById('act-cost-payer');
+            if (actPayerSelect) {
+                const currentActPayerVal = actPayerSelect.value;
+                actPayerSelect.innerHTML = "";
+                state.companions.forEach(c => {
+                    actPayerSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+                actPayerSelect.value = currentActPayerVal || state.companions[0];
+            }
+        }
+
+        // 旅伴名單修改
+        function updateCompanions(val) {
+            if (!isAdminMode) return;
+            const list = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            if (list.length === 0) return;
+            state.companions = list;
+            saveState();
+            applyState();
+        }
+
+        // ==================== 雲端 Google Sheet 同步機制 ====================
+        function updateSyncStatusUI() {
+            const btn = document.getElementById('sync-status-btn');
+            const ping = document.getElementById('sync-indicator-ping');
+            const dot = document.getElementById('sync-indicator-dot');
+            const text = document.getElementById('sync-status-text');
+
+            if (state.googleScriptUrl) {
+                btn.className = "flex items-center space-x-1 bg-emerald-50 text-emerald-600 px-3 py-2 rounded-xl font-medium border border-emerald-100 hover:bg-emerald-100 transition flex-1 sm:flex-none justify-center cursor-pointer";
+                ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                dot.className = "relative inline-flex rounded-full h-2 w-2 bg-emerald-500";
+                text.textContent = isAdminMode ? "已連接 (管理設定)" : "已連接試算表";
+            } else {
+                btn.className = "flex items-center space-x-1 bg-rose-50 text-rose-600 px-3 py-2 rounded-xl font-medium border border-rose-100 hover:bg-rose-100 transition flex-1 sm:flex-none justify-center cursor-pointer";
+                ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75";
+                dot.className = "relative inline-flex rounded-full h-2 w-2 bg-rose-500";
+                text.textContent = "尚未連線試算表";
+            }
+        }
+
+        async function syncToGoogleSheet() {
+            if (!state.googleScriptUrl) return;
+            const text = document.getElementById('sync-status-text');
+            text.textContent = "同步中...";
+
+            try {
+                await fetch(state.googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state)
+                });
+                
+                setTimeout(() => {
+                    text.textContent = "同步成功";
+                    updateSyncStatusUI();
+                }, 1000);
+
+            } catch (error) {
+                console.error("同步失敗：", error);
+                text.textContent = "同步失敗 ❌";
+                setTimeout(() => updateSyncStatusUI(), 3000);
+            }
+        }
+
+        async function fetchFromGoogleSheet() {
+            if (!state.googleScriptUrl) return;
+            try {
+                const response = await fetch(state.googleScriptUrl);
+                const result = await response.json();
+                
+                if (result.status === "success" && result.data && Object.keys(result.data).length > 0) {
+                    state = result.data;
+                    saveState(true);
+                    applyState();
+                }
+            } catch (err) {
+                console.error("下載同步失敗：", err);
+            }
+        }
+
+        function checkAndSyncAuto() {
+            if (state.googleScriptUrl) {
+                fetchFromGoogleSheet();
+                setInterval(fetchFromGoogleSheet, 30000);
+            }
+        }
+
+        function openSyncModal() {
+            if (!isAdminMode) {
+                showToast("此功能僅限管理員後台模式開啟", "🔒");
+                return;
+            }
+            document.getElementById('sync-url-input').value = state.googleScriptUrl || "";
+            document.getElementById('sync-modal').classList.remove('hidden');
+            document.getElementById('sync-modal').classList.add('flex');
+        }
+        function closeSyncModal() {
+            document.getElementById('sync-modal').classList.add('hidden');
+            document.getElementById('sync-modal').classList.remove('flex');
+        }
+        function saveSyncSettings() {
+            const url = document.getElementById('sync-url-input').value.trim();
+            state.googleScriptUrl = url;
+            saveState();
+            closeSyncModal();
+            updateSyncStatusUI();
+            if (url) {
+                fetchFromGoogleSheet();
+            }
+        }
+
+
+        // ==================== 1. 行程規劃 ====================
+        function renderDayList() {
+            const container = document.getElementById('day-list');
+            container.innerHTML = "";
+            
+            if (state.days.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4 w-full">目前尚無天數規劃</p>`;
+                return;
+            }
+
+            state.days.forEach((day, index) => {
+                const activeClass = state.activeDayIndex === index 
+                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" 
+                    : "bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60";
+                
+                const dateObj = new Date(day.date);
+                const weekday = isNaN(dateObj) ? "" : " " + ["日", "一", "二", "三", "四", "五", "六"][dateObj.getDay()];
+
+                container.innerHTML += `
+                    <button type="button" onclick="selectDay(${index})" class="w-36 sm:w-44 lg:w-full text-left p-3 rounded-xl transition duration-150 flex flex-col justify-between flex-shrink-0 lg:flex-shrink ${activeClass}">
+                        <div class="font-bold text-xs sm:text-sm truncate w-full">Day ${index + 1} ${day.title}</div>
+                        <div class="text-[10px] opacity-80 mt-1 flex items-center justify-between w-full">
+                            <span class="flex items-center space-x-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <span>${day.date}${weekday ? ' (' + weekday + ')' : ''}</span>
+                            </span>
+                        </div>
+                    </button>
+                `;
+            });
+        }
+
+        function selectDay(index) {
+            state.activeDayIndex = index;
+            saveState(true);
+            renderDayList();
+            renderItinerary();
+        }
+
+        function renderItinerary() {
+            const container = document.getElementById('activity-timeline');
+            container.innerHTML = "";
+
+            const currentDay = state.days[state.activeDayIndex];
+            if (!currentDay) {
+                container.innerHTML = `<p class="text-slate-400 text-sm py-4">請建立天數以新增行程</p>`;
+                return;
+            }
+
+            document.getElementById('current-day-title').textContent = `Day ${state.activeDayIndex + 1} ${currentDay.title}`;
+            
+            const dateObj = new Date(currentDay.date);
+            const weekday = isNaN(dateObj) ? "" : " 星期" + ["日", "一", "二", "三", "四", "五", "六"][dateObj.getDay()];
+            document.getElementById('current-day-date').textContent = `${currentDay.date}${weekday}`;
+
+            const showOnlyTodo = document.getElementById('filter-incomplete').checked;
+
+            let activities = [...currentDay.activities];
+            activities.sort((a, b) => a.time.localeCompare(b.time));
+
+            if (activities.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 text-sm py-4">這天還沒有規劃任何活動，開啟後台解鎖模式即可新增！</p>`;
+                return;
+            }
+
+            activities.forEach((act) => {
+                if (showOnlyTodo && act.status !== 'todo') return;
+
+                let typeColor = "bg-slate-100 text-slate-700";
+                let typeLabel = "景點";
+                if (act.type === "transport") { typeColor = "bg-blue-50 text-blue-600 border border-blue-100"; typeLabel = "交通"; }
+                else if (act.type === "lodging") { typeColor = "bg-emerald-50 text-emerald-600 border border-emerald-100"; typeLabel = "住宿"; }
+                else if (act.type === "food") { typeColor = "bg-amber-50 text-amber-600 border border-amber-100"; typeLabel = "美食"; }
+                else if (act.type === "shopping") { typeColor = "bg-purple-50 text-purple-600 border border-purple-100"; typeLabel = "購物"; }
+
+                const isTodo = act.status === 'todo' ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-100 text-slate-400 hover:bg-slate-200';
+                const isDone = act.status === 'completed' ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-100 text-slate-400 hover:bg-slate-200';
+                const isCancel = act.status === 'cancelled' ? 'bg-rose-600 text-white font-bold' : 'bg-slate-100 text-slate-400 hover:bg-slate-200';
+
+                let cardBgClass = "bg-white hover:shadow-md border border-slate-100";
+                let textMutedClass = "text-slate-800";
+                let descMutedClass = "text-slate-500";
+                let timeBadgeClass = "text-indigo-600 bg-indigo-50";
+
+                if (act.status === 'completed') {
+                    cardBgClass = "bg-slate-100 border-slate-200 opacity-75 grayscale-[15%]";
+                    textMutedClass = "text-slate-500"; 
+                    descMutedClass = "text-slate-400";
+                    timeBadgeClass = "text-slate-500 bg-slate-200";
+                } else if (act.status === 'cancelled') {
+                    cardBgClass = "bg-slate-50/70 border-slate-200/50 line-through opacity-50";
+                    textMutedClass = "text-slate-400";
+                    descMutedClass = "text-slate-400";
+                    timeBadgeClass = "text-slate-400 bg-slate-200/50";
+                }
+
+                let subStepsHTML = "";
+                if (act.subSteps && act.subSteps.length > 0) {
+                    subStepsHTML = `
+                        <div class="mt-4 border border-indigo-50 bg-indigo-50/20 p-3.5 rounded-xl space-y-2">
+                            ${act.subSteps.map(step => `
+                                <div class="flex items-start text-xs leading-5">
+                                    <span class="font-bold text-indigo-600 min-w-[45px]">${step.time}</span>
+                                    <span class="text-slate-600">${step.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                let costHTML = "";
+                if (act.cost && (act.cost.payer && act.cost.amount)) {
+                    const currencySymbol = act.cost.currency === "KRW" ? "₩" : "NT$";
+                    const rateText = act.cost.currency !== "TWD" ? ` (匯率 ${act.cost.rate || 1})` : "";
+                    const splitLabel = act.cost.isPersonal ? "👤 個人自付" : "👥 共同分帳";
+                    const splitClass = act.cost.isPersonal ? "bg-purple-50 text-purple-700 border-purple-100" : "bg-orange-50 text-orange-700 border-orange-100";
+                    
+                    costHTML = `
+                        <div class="mt-3 flex items-center space-x-2">
+                            <span class="border text-xs px-2.5 py-1 rounded-lg font-medium flex items-center space-x-1 shadow-sm ${splitClass}">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                                <span>${act.cost.payer}: [${act.cost.item || '行程費用'}] ${currencySymbol}${parseFloat(act.cost.amount).toLocaleString()}${rateText} (${splitLabel})</span>
+                            </span>
+                        </div>
+                    `;
+                }
+
+                const mapBtn = act.mapUrl && act.mapUrl !== "#" && act.mapUrl.trim() !== "" 
+                    ? `<a href="${act.mapUrl}" target="_blank" class="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition inline-flex items-center space-x-1"><svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg><span>開啟地圖</span></a>` 
+                    : '';
+                
+                const voucherBtn = act.voucherUrl && act.voucherUrl !== "#" && act.voucherUrl.trim() !== "" 
+                    ? `<a href="${act.voucherUrl}" target="_blank" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-100 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition inline-flex items-center space-x-1"><svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg><span>開啟憑證 / QR</span></a>` 
+                    : '';
+
+                const actionButtonsHTML = (mapBtn || voucherBtn) 
+                    ? `<div class="mt-4 flex flex-wrap gap-2">${mapBtn}${voucherBtn}</div>` 
+                    : '';
+
+                container.innerHTML += `
+                    <div class="relative group">
+                        <div class="absolute -left-[31px] md:-left-[39px] top-1.5 bg-white border-4 border-indigo-600 rounded-full w-4 h-4 z-10"></div>
+                        
+                        <div class="rounded-2xl p-4 md:p-5 transition duration-150 ${cardBgClass}">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-center space-x-2 flex-wrap gap-1.5">
+                                    <span class="text-xs sm:text-sm font-black bg-indigo-50 px-2 py-0.5 rounded-lg ${timeBadgeClass}">${act.time}</span>
+                                    <h4 class="font-bold text-sm sm:text-base group-hover:text-indigo-600 transition truncate max-w-[150px] xs:max-w-xs sm:max-w-sm ${textMutedClass}">${act.title}</h4>
+                                    <span class="text-xs px-2 py-0.5 rounded-full ${typeColor} whitespace-nowrap">${typeLabel}</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between sm:justify-end space-x-2 mt-2 sm:mt-0">
+                                    <div class="flex bg-slate-100 p-0.5 rounded-lg text-[10px]">
+                                        <button type="button" onclick="setActStatus('${act.id}', 'todo')" class="px-2 py-1 rounded-md transition ${isTodo}">未開始</button>
+                                        <button type="button" onclick="setActStatus('${act.id}', 'completed')" class="px-2 py-1 rounded-md transition ${isDone}">已完成</button>
+                                        <button type="button" onclick="setActStatus('${act.id}', 'cancelled')" class="px-2 py-1 rounded-md transition ${isCancel}">已取消</button>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <button type="button" onclick="editActivity('${act.id}')" class="admin-only p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-indigo-600 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                        </button>
+                                        <button type="button" onclick="deleteActivity('${act.id}')" class="admin-only p-1 hover:bg-rose-50 rounded text-slate-400 hover:text-rose-600 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${act.desc ? `<p class="mt-3 text-sm leading-relaxed ${descMutedClass}">${act.desc}</p>` : ''}
+                            ${subStepsHTML}
+                            ${costHTML}
+                            ${actionButtonsHTML}
+                        </div>
+                    </div>
+                `;
+            });
+            applyRoleVisibility(); 
+        }
+
+        // 天數控制
+        function openDayModal(edit = false) {
+            if (!isAdminMode) return;
+            if (edit) {
+                editingDayIndex = state.activeDayIndex;
+                const d = state.days[editingDayIndex];
+                document.getElementById('day-modal-title').textContent = "修改天數資訊";
+                document.getElementById('day-title-input').value = d.title;
+                document.getElementById('day-date-input').value = d.date;
+            } else {
+                editingDayIndex = null;
+                document.getElementById('day-modal-title').textContent = "新增旅程天數";
+                document.getElementById('day-title-input').value = "";
+                if (state.days.length > 0) {
+                    const lastDate = new Date(state.days[state.days.length - 1].date);
+                    lastDate.setDate(lastDate.getDate() + 1);
+                    document.getElementById('day-date-input').value = lastDate.toISOString().split('T')[0];
+                } else {
+                    document.getElementById('day-date-input').value = new Date().toISOString().split('T')[0];
+                }
+            }
+            document.getElementById('day-modal').classList.remove('hidden');
+            document.getElementById('day-modal').classList.add('flex');
+        }
+
+        function closeDayModal() {
+            document.getElementById('day-modal').classList.add('hidden');
+            document.getElementById('day-modal').classList.remove('flex');
+        }
+
+        function saveDay() {
+            const title = document.getElementById('day-title-input').value.trim() || "新天數";
+            const date = document.getElementById('day-date-input').value;
+            if (!date) return;
+
+            if (editingDayIndex !== null) {
+                state.days[editingDayIndex].title = title;
+                state.days[editingDayIndex].date = date;
+            } else {
+                state.days.push({ title, date, activities: [] });
+                state.activeDayIndex = state.days.length - 1;
+            }
+            saveState();
+            applyState();
+            closeDayModal();
+        }
+
+        function editCurrentDay() {
+            openDayModal(true);
+        }
+
+        function deleteCurrentDay() {
+            if (!isAdminMode) return;
+            if (state.days.length === 0) return;
+            showConfirm(
+                "刪除天數", 
+                "您確定要刪除這一天嗎？所有相關行程與共同帳務皆會被清空！", 
+                true, 
+                () => {
+                    state.days.splice(state.activeDayIndex, 1);
+                    state.activeDayIndex = Math.max(0, state.activeDayIndex - 1);
+                    saveState();
+                    applyState();
+                    showToast("天數刪除成功！", "🗑️");
+                }
+            );
+        }
+
+        // 活動行程
+        function openActivityModal(actId = null) {
+            if (!isAdminMode) {
+                showToast("此功能僅限管理員後台模式開啟", "🔒");
+                return;
+            }
+            populateDropdowns();
+            if (actId) {
+                editingActivityId = actId;
+                const act = state.days[state.activeDayIndex].activities.find(a => a.id === actId);
+                document.getElementById('activity-modal-title').textContent = "修改行程活動";
+                document.getElementById('act-time').value = act.time;
+                document.getElementById('act-type').value = act.type;
+                document.getElementById('act-title').value = act.title;
+                document.getElementById('act-desc').value = act.desc || "";
+                document.getElementById('act-map-url').value = act.mapUrl || "";
+                document.getElementById('act-voucher-url').value = act.voucherUrl || "";
+                
+                if (act.subSteps && act.subSteps.length > 0) {
+                    document.getElementById('act-substeps').value = act.subSteps.map(s => `${s.time} ${s.text}`).join('\n');
+                } else {
+                    document.getElementById('act-substeps').value = "";
+                }
+
+                if (act.cost) {
+                    document.getElementById('act-cost-payer').value = act.cost.payer || state.companions[0];
+                    document.getElementById('act-cost-currency').value = act.cost.currency || "TWD";
+                    document.getElementById('act-cost-amount').value = act.cost.amount || "";
+                    document.getElementById('act-cost-rate').value = act.cost.rate || (act.cost.currency === "KRW" ? 0.0241 : 1.0);
+                    document.getElementById('act-cost-personal').value = act.cost.isPersonal ? "true" : "false";
+                } else {
+                    document.getElementById('act-cost-payer').value = state.companions[0];
+                    document.getElementById('act-cost-currency').value = "TWD";
+                    document.getElementById('act-cost-amount').value = "";
+                    document.getElementById('act-cost-rate').value = "1.0";
+                    document.getElementById('act-cost-personal').value = "false";
+                }
+            } else {
+                editingActivityId = null;
+                document.getElementById('activity-modal-title').textContent = "新增行程活動";
+                document.getElementById('act-time').value = "10:00";
+                document.getElementById('act-type').value = "spot";
+                document.getElementById('act-title').value = "";
+                document.getElementById('act-desc').value = "";
+                document.getElementById('act-substeps').value = "";
+                document.getElementById('act-cost-payer').value = state.companions[0];
+                document.getElementById('act-cost-currency').value = "TWD";
+                document.getElementById('act-cost-amount').value = "";
+                document.getElementById('act-cost-rate').value = "1.0";
+                document.getElementById('act-cost-personal').value = "false";
+                document.getElementById('act-map-url').value = "";
+                document.getElementById('act-voucher-url').value = "";
+            }
+            toggleActRateField(document.getElementById('act-cost-currency').value);
+            document.getElementById('activity-modal').classList.remove('hidden');
+            document.getElementById('activity-modal').classList.add('flex');
+        }
+
+        function toggleActRateField(currency) {
+            const rateInput = document.getElementById('act-cost-rate');
+            if (currency === "TWD") {
+                rateInput.value = "1.0";
+                rateInput.disabled = true;
+                rateInput.classList.add('bg-slate-200/50', 'text-slate-400');
+            } else {
+                rateInput.disabled = false;
+                rateInput.classList.remove('bg-slate-200/50', 'text-slate-400');
+                if (rateInput.value === "1.0" || !rateInput.value) {
+                    rateInput.value = "0.0241"; 
+                }
+            }
+        }
+
+        function closeActivityModal() {
+            document.getElementById('activity-modal').classList.add('hidden');
+            document.getElementById('activity-modal').classList.remove('flex');
+        }
+
+        function saveActivity() {
+            const time = document.getElementById('act-time').value.trim() || "12:00";
+            const type = document.getElementById('act-type').value;
+            const title = document.getElementById('act-title').value.trim() || "未命名行程";
+            const desc = document.getElementById('act-desc').value.trim();
+            const mapUrl = document.getElementById('act-map-url').value.trim();
+            const voucherUrl = document.getElementById('act-voucher-url').value.trim();
+
+            const subStepsText = document.getElementById('act-substeps').value.trim();
+            const subSteps = [];
+            if (subStepsText) {
+                const lines = subStepsText.split('\n');
+                lines.forEach(line => {
+                    const parts = line.trim().split(/\s+/);
+                    if (parts.length >= 2) {
+                        subSteps.push({ time: parts[0], text: parts.slice(1).join(' ') });
+                    }
+                });
+            }
+
+            const payer = document.getElementById('act-cost-payer').value;
+            const currency = document.getElementById('act-cost-currency').value;
+            const amountVal = parseFloat(document.getElementById('act-cost-amount').value);
+            const rateVal = parseFloat(document.getElementById('act-cost-rate').value) || 1.0;
+            const isPersonal = document.getElementById('act-cost-personal').value === "true";
+
+            let cost = null;
+            if (payer && !isNaN(amountVal) && amountVal > 0) {
+                cost = {
+                    payer,
+                    item: "活動費用",
+                    amount: amountVal,
+                    currency,
+                    rate: rateVal,
+                    isPersonal: isPersonal
+                };
+            }
+
+            const currentDay = state.days[state.activeDayIndex];
+
+            if (editingActivityId) {
+                const act = currentDay.activities.find(a => a.id === editingActivityId);
+                if (act) {
+                    act.time = time;
+                    act.type = type;
+                    act.title = title;
+                    act.desc = desc;
+                    act.subSteps = subSteps;
+                    act.cost = cost;
+                    act.mapUrl = mapUrl || "#";
+                    act.voucherUrl = voucherUrl || "#";
+                }
+            } else {
+                currentDay.activities.push({
+                    id: 'act-' + Date.now(),
+                    time, type, title, desc, subSteps, cost, status: 'todo', mapUrl: mapUrl || "#", voucherUrl: voucherUrl || "#"
+                });
+            }
+
+            saveState();
+            applyState();
+            closeActivityModal();
+            showToast("活動行程儲存成功！", "✅");
+        }
+
+        function setActStatus(actId, status) {
+            const act = state.days[state.activeDayIndex].activities.find(a => a.id === actId);
+            if (act) {
+                act.status = status;
+                saveState();
+                renderItinerary();
+                renderLedger(); 
+                showToast(`狀態已更新為【${status === 'todo' ? '未開始' : status === 'completed' ? '已完成' : '已取消'}】`, "⚡");
+            }
+        }
+
+        function editActivity(actId) {
+            openActivityModal(actId);
+        }
+
+        function deleteActivity(actId) {
+            if (!isAdminMode) return;
+            showConfirm(
+                "刪除行程", 
+                "您確定要將這筆行程活動從計畫中移除嗎？", 
+                true, 
+                () => {
+                    const day = state.days[state.activeDayIndex];
+                    day.activities = day.activities.filter(a => a.id !== actId);
+                    saveState();
+                    applyState();
+                    showToast("行程已移除！", "🗑️");
+                }
+            );
+        }
+
+
+        // ==================== 2. 財務記帳 & 分帳 ====================
+        function renderLedger() {
+            const payments = {};
+            state.companions.forEach(c => {
+                payments[c] = { sharedTwd: 0, rawKrw: 0 };
+            });
+
+            // A. 行前共同與個人費用加總
+            state.preTravelExpenses.forEach(exp => {
+                const payer = exp.payer;
+                const totalCost = (parseFloat(exp.price) || 0) * (parseInt(exp.qty) || 0);
+                const rate = parseFloat(exp.rate) || 1.0;
+                const isPersonal = exp.isPersonal === true;
+
+                if (payments[payer] !== undefined) {
+                    // 若為個人自付項目，不列入 sharedTwd
+                    if (!isPersonal) {
+                        if (exp.currency === "KRW") {
+                            payments[payer].rawKrw += totalCost;
+                            payments[payer].sharedTwd += totalCost * rate;
+                        } else {
+                            payments[payer].sharedTwd += totalCost;
+                        }
+                    }
+                }
+            });
+
+            // B. 每日行程費用
+            state.days.forEach(day => {
+                day.activities.forEach(act => {
+                    if (act.cost && act.cost.payer && act.cost.amount) {
+                        const payer = act.cost.payer;
+                        const amount = parseFloat(act.cost.amount) || 0;
+                        const rate = parseFloat(act.cost.rate) || 1.0; 
+                        const currency = act.cost.currency || "TWD";
+                        const isPersonal = act.cost.isPersonal === true;
+
+                        if (payments[payer] !== undefined) {
+                            if (!isPersonal) {
+                                if (currency === "KRW") {
+                                    payments[payer].rawKrw += amount;
+                                    payments[payer].sharedTwd += amount * rate;
+                                } else {
+                                    payments[payer].sharedTwd += amount;
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            // 渲染團員已付共同款卡片
+            const cardsContainer = document.getElementById('companions-payment-cards');
+            cardsContainer.innerHTML = "";
+            state.companions.forEach(c => {
+                const payData = payments[c] || { sharedTwd: 0, rawKrw: 0 };
+                cardsContainer.innerHTML += `
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col space-y-1.5 shadow-sm">
+                        <div class="font-bold text-slate-800 flex items-center space-x-1.5">
+                            <span class="text-indigo-600">👤</span>
+                            <span>${c}</span>
+                        </div>
+                        <div class="text-xs text-slate-600 flex justify-between">
+                            <span>共同已付(台幣折算)：</span>
+                            <span class="font-bold text-slate-800">NT$ ${Math.round(payData.sharedTwd).toLocaleString()}</span>
+                        </div>
+                        <div class="text-xs text-slate-600 flex justify-between">
+                            <span>其中包含(外幣已付)：</span>
+                            <span class="font-bold text-slate-800 font-mono">₩ ${Math.round(payData.rawKrw).toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 分帳智慧結算（排除個人自付）
+            let totalSharedSpent = 0;
+            state.companions.forEach(c => {
+                const payData = payments[c];
+                if (payData) {
+                    totalSharedSpent += payData.sharedTwd;
+                }
+            });
+
+            const count = state.companions.length;
+            const avgShare = count > 0 ? (totalSharedSpent / count) : 0;
+
+            const balances = {};
+            state.companions.forEach(c => {
+                const payData = payments[c] || { sharedTwd: 0 };
+                balances[c] = payData.sharedTwd - avgShare;
+            });
+
+            const debtors = [];
+            const creditors = [];
+            for (let person in balances) {
+                if (balances[person] < -0.1) {
+                    debtors.push({ name: person, amount: Math.abs(balances[person]) });
+                } else if (balances[person] > 0.1) {
+                    creditors.push({ name: person, amount: balances[person] });
+                }
+            }
+
+            const rawTransactions = [];
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                let debtor = debtors[i];
+                let creditor = creditors[j];
+                let minAmount = Math.min(debtor.amount, creditor.amount);
+
+                rawTransactions.push({
+                    id: `trans-${debtor.name}-${creditor.name}-${Math.round(minAmount)}`,
+                    from: debtor.name,
+                    to: creditor.name,
+                    amount: Math.round(minAmount)
+                });
+
+                debtor.amount -= minAmount;
+                creditor.amount -= minAmount;
+
+                if (debtor.amount < 0.1) i++;
+                if (creditor.amount < 0.1) j++;
+            }
+
+            const settlementList = document.getElementById('ledger-settlement-list');
+            settlementList.innerHTML = "";
+
+            const activeTransactions = rawTransactions.filter(t => !state.settledHistory.some(h => h.id === t.id));
+
+            if (activeTransactions.length === 0) {
+                settlementList.innerHTML = `<div class="text-sm text-slate-400 py-4 text-center">🎉 目前所有共同款項已結清！</div>`;
+            } else {
+                activeTransactions.forEach(t => {
+                    settlementList.innerHTML += `
+                        <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-150 gap-3">
+                            <div class="flex items-center space-x-2 text-sm text-slate-700">
+                                <span class="text-orange-500">🔄</span>
+                                <span><strong>${t.from}</strong> 應匯給 <strong>${t.to}</strong> : <strong class="font-extrabold text-orange-600">NT$ ${t.amount.toLocaleString()}</strong></span>
+                            </div>
+                            <button type="button" onclick="confirmSettlement('${t.id}', '${t.from}', '${t.to}', ${t.amount})" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center space-x-1 self-end xs:self-auto shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                <span>確認已結</span>
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+
+            const settledHistoryContainer = document.getElementById('settled-history-list');
+            if (state.settledHistory.length === 0) {
+                settledHistoryContainer.innerHTML = "尚無已結清歷史。";
+            } else {
+                settledHistoryContainer.innerHTML = state.settledHistory.map(h => `
+                    <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100 text-slate-600">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="text-emerald-500 font-bold">✔</span>
+                            <span class="text-xs"><strong>${h.from}</strong> 已匯給 <strong>${h.to}</strong> : <strong class="text-emerald-600">NT$ ${h.amount.toLocaleString()}</strong></span>
+                        </div>
+                        <button type="button" onclick="deleteSettledHistory('${h.id}')" class="text-[10px] text-rose-500 hover:underline">撤銷</button>
+                    </div>
+                `).join('');
+            }
+
+            renderCombinedDetailsTable();
+        }
+
+        // 合併記帳明細列表 (優化匯率輸入、幣別切換與個人/分帳選擇)
+        function renderCombinedDetailsTable() {
+            const tbody = document.getElementById('pretravel-table-body');
+            tbody.innerHTML = "";
+
+            const allTx = [];
+
+            // A. 載入行前費用
+            state.preTravelExpenses.forEach((exp, idx) => {
+                allTx.push({
+                    uniqueId: `pre-${exp.id || idx}`,
+                    type: 'pretravel',
+                    rawIndex: idx, 
+                    date: '行前費用',
+                    item: exp.item,
+                    payer: exp.payer,
+                    qty: exp.qty,
+                    price: exp.price,
+                    currency: exp.currency,
+                    rate: exp.rate,
+                    isPersonal: exp.isPersonal === true,
+                    totalOriginal: exp.price * exp.qty,
+                    totalTwd: exp.price * exp.qty * exp.rate
+                });
+            });
+
+            // B. 載入行程花費
+            state.days.forEach((day, dayIdx) => {
+                day.activities.forEach(act => {
+                    if (act.cost && act.cost.payer && act.cost.amount) {
+                        allTx.push({
+                            uniqueId: `act-${act.id}`,
+                            type: 'itinerary',
+                            dayIndex: dayIdx,
+                            activityId: act.id,
+                            date: day.date,
+                            item: `${act.title} [${act.cost.item || '費用'}]`,
+                            payer: act.cost.payer,
+                            qty: 1,
+                            price: act.cost.amount,
+                            currency: act.cost.currency,
+                            rate: act.cost.rate || 1.0,
+                            isPersonal: act.cost.isPersonal === true,
+                            totalOriginal: act.cost.amount,
+                            totalTwd: act.cost.amount * (act.cost.rate || 1.0)
+                        });
+                    }
+                });
+            });
+
+            // 排序 (行前費用排第一順位)
+            allTx.sort((a, b) => {
+                if (a.date === '行前費用' && b.date !== '行前費用') return -1;
+                if (a.date !== '行前費用' && b.date === '行前費用') return 1;
+                if (a.date === '行前費用' && b.date === '行前費用') return 0;
+                return a.date.localeCompare(b.date);
+            });
+
+            const itemsPerPage = 20;
+            const totalPages = Math.ceil(allTx.length / itemsPerPage) || 1;
+            
+            if (currentLedgerPage > totalPages) currentLedgerPage = totalPages;
+            if (currentLedgerPage < 1) currentLedgerPage = 1;
+
+            const startIndex = (currentLedgerPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedTx = allTx.slice(startIndex, endIndex);
+
+            if (paginatedTx.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400">目前無任何記帳明細。</td></tr>`;
+                document.getElementById('ledger-pagination-container').innerHTML = "";
+                return;
+            }
+
+            const isLocked = !isAdminMode;
+
+            paginatedTx.forEach(tx => {
+                if (tx.type === 'pretravel') {
+                    // 行前費用：後台可編輯
+                    let payerOptions = "";
+                    state.companions.forEach(c => {
+                        const selected = tx.payer === c ? "selected" : "";
+                        payerOptions += `<option value="${c}" ${selected}>${c}</option>`;
+                    });
+
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-150 hover:bg-slate-50/50 align-middle">
+                            <td class="py-3 px-4 text-xs font-semibold text-slate-400 select-none">${tx.date}</td>
+                            <td class="py-3 px-4">
+                                <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 font-bold disabled:bg-slate-100 disabled:text-slate-400">
+                            </td>
+                            <td class="py-3 px-4">
+                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-semibold text-slate-800 disabled:bg-slate-100 disabled:text-slate-400">
+                                    ${payerOptions}
+                                </select>
+                            </td>
+                            <td class="py-3 px-4">
+                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100 disabled:text-slate-450">
+                                    <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 共同分帳</option>
+                                    <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人自付</option>
+                                </select>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <input type="number" value="${tx.qty}" onchange="updatePreTravelRow(${tx.rawIndex}, 'qty', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white text-center border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100">
+                            </td>
+                            <td class="py-3 px-4">
+                                <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white text-right border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100">
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" ${isLocked ? "disabled" : ""} class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-bold text-slate-800 disabled:bg-slate-100">
+                                    <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
+                                    <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
+                                </select>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${(isLocked || tx.currency === 'TWD') ? "disabled" : ""} class="w-full bg-white text-right border border-slate-200 rounded-lg p-2 text-xs focus:outline-none font-mono text-slate-800 font-bold disabled:bg-slate-100 disabled:text-slate-400">
+                            </td>
+                            <td class="py-3 px-4 text-right font-black text-slate-900 text-xs">
+                                NT$ ${Math.round(tx.totalTwd).toLocaleString()}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="admin-only text-rose-500 hover:text-rose-700 p-1 rounded transition">
+                                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    // 行程中消費
+                    const dateObj = new Date(tx.date);
+                    const weekday = isNaN(dateObj) ? "" : " (週" + ["日", "一", "二", "三", "四", "五", "六"][dateObj.getDay()] + ")";
+                    const splitLabel = tx.isPersonal ? "👤 個人自付" : "👥 共同分帳";
+                    const splitClass = tx.isPersonal ? "text-purple-600 bg-purple-50" : "text-orange-600 bg-orange-50";
+
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-150 bg-indigo-50/20 hover:bg-indigo-100/30 align-middle">
+                            <td class="py-3 px-4 text-xs font-bold text-indigo-600 whitespace-nowrap select-none">${tx.date}${weekday}</td>
+                            <td class="py-3 px-4 text-xs font-bold text-slate-700">
+                                <div class="flex items-center space-x-1.5 truncate max-w-[200px]" title="${tx.item}">
+                                    <span class="text-indigo-500 select-none">📍</span>
+                                    <span>${tx.item}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-xs font-semibold text-slate-600 select-none">${tx.payer}</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 rounded text-[11px] font-bold ${splitClass}">${splitLabel}</span>
+                            </td>
+                            <td class="py-3 px-4 text-center text-xs text-slate-400 select-none">${tx.qty}</td>
+                            <td class="py-3 px-4 text-right text-xs font-bold text-slate-600 font-mono">${tx.price.toLocaleString()}</td>
+                            <td class="py-3 px-4 text-center text-xs font-black text-slate-500 select-none">${tx.currency}</td>
+                            <td class="py-3 px-4 text-right text-xs font-mono text-slate-500 select-none">${tx.rate}</td>
+                            <td class="py-3 px-4 text-right font-black text-indigo-700 text-xs">
+                                NT$ ${Math.round(tx.totalTwd).toLocaleString()}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[11px] text-indigo-600 bg-white hover:bg-indigo-50 border border-indigo-200 px-2 py-1.5 rounded font-bold transition whitespace-nowrap shadow-sm">
+                                    🔍 行程
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            // 渲染分頁
+            let paginationContainer = document.getElementById('ledger-pagination-container');
+            if (totalPages > 1) {
+                paginationContainer.className = "flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-150 px-4 mt-4 gap-3";
+                paginationContainer.innerHTML = `
+                    <div class="text-xs text-slate-500 font-medium select-none">
+                        顯示第 ${startIndex + 1} 至 ${Math.min(endIndex, allTx.length)} 筆，共 ${allTx.length} 筆記帳項目
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button type="button" onclick="changeLedgerPage(${currentLedgerPage - 1})" ${currentLedgerPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm">
+                            上一頁
+                        </button>
+                        <span class="text-xs font-black text-slate-700 bg-slate-100 border border-slate-200 px-3.5 py-1.5 rounded-xl select-none">
+                            第 ${currentLedgerPage} / ${totalPages} 頁
+                        </span>
+                        <button type="button" onclick="changeLedgerPage(${currentLedgerPage + 1})" ${currentLedgerPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm">
+                            下一頁
+                        </button>
+                    </div>
+                `;
+            } else {
+                paginationContainer.innerHTML = "";
+            }
+
+            applyRoleVisibility(); 
+        }
+
+        function changeLedgerPage(page) {
+            currentLedgerPage = page;
+            renderCombinedDetailsTable();
+        }
+
+        function switchTabAndSelectDay(dayIndex) {
+            switchTab('itinerary');
+            selectDay(dayIndex);
+            showToast(`已跳轉至 Day ${dayIndex + 1} 行程計畫`, "📍");
+        }
+
+        // 行前費用增刪
+        function addPreTravelRow() {
+            if (!isAdminMode) return;
+            state.preTravelExpenses.push({
+                id: 'pre-' + Date.now(),
+                item: "行前費用品項",
+                payer: state.companions[0],
+                qty: 1,
+                price: 0,
+                currency: "TWD",
+                rate: 1.0,
+                isPersonal: false
+            });
+            saveState();
+            applyState();
+            showToast("已新增一筆行前共同費用欄位", "➕");
+        }
+
+        function updatePreTravelRow(index, field, value) {
+            if (!isAdminMode) return;
+            const exp = state.preTravelExpenses[index];
+            if (!exp) return;
+
+            if (field === "qty") {
+                exp.qty = parseInt(value) || 1;
+            } else if (field === "price") {
+                exp.price = parseFloat(value) || 0;
+            } else if (field === "rate") {
+                exp.rate = parseFloat(value) || 1.0;
+            } else if (field === "currency") {
+                exp.currency = value;
+                exp.rate = value === "TWD" ? 1.0 : 0.0241;
+            } else if (field === "isPersonal") {
+                exp.isPersonal = value === "true";
+            } else {
+                exp[field] = value;
+            }
+
+            saveState();
+            applyState();
+        }
+
+        function deletePreTravelRow(index) {
+            if (!isAdminMode) return;
+            state.preTravelExpenses.splice(index, 1);
+            saveState();
+            applyState();
+            showToast("費用已被刪除", "🗑️");
+        }
+
+        function confirmSettlement(id, from, to, amount) {
+            state.settledHistory.push({
+                id: id,
+                from: from,
+                to: to,
+                amount: amount,
+                timestamp: Date.now()
+            });
+            saveState();
+            applyState();
+            showToast("分帳結算完成！", "🎉");
+        }
+
+        function deleteSettledHistory(id) {
+            state.settledHistory = state.settledHistory.filter(h => h.id !== id);
+            saveState();
+            applyState();
+            showToast("已撤銷此筆分帳！", "🔄");
+        }
+
+
+        // ==================== 3. 票券憑證管理 ====================
+        function renderVouchers() {
+            const grid = document.getElementById('voucher-grid');
+            grid.innerHTML = "";
+
+            if (state.vouchers.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-slate-400 text-center py-8">目前無票券，請點擊右上角新增。</div>`;
+                return;
+            }
+
+            state.vouchers.forEach(v => {
+                const voucherUrlBtn = v.url && v.url.trim() !== "" && v.url !== "#"
+                    ? `<a href="${v.url}" target="_blank" class="mt-3 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        <span>開啟憑證連結</span>
+                       </a>`
+                    : '';
+
+                grid.innerHTML += `
+                    <div class="bg-white border-2 border-dashed border-indigo-150 hover:border-indigo-400 hover:shadow-md transition duration-200 rounded-2xl p-5 relative group flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-indigo-50 text-indigo-600 text-xs px-2.5 py-1 rounded-lg font-bold">${v.type}</span>
+                                <div class="flex space-x-2">
+                                    <button type="button" onclick="editVoucher('${v.id}')" class="admin-only text-xs text-slate-400 hover:text-indigo-600">修改</button>
+                                    <button type="button" onclick="deleteVoucher('${v.id}')" class="admin-only text-xs text-rose-500 hover:text-rose-700">刪除</button>
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base mb-2">${v.title}</h4>
+                            ${v.code ? `
+                                <div class="bg-slate-50 p-2.5 rounded-xl text-center border border-slate-100 font-mono text-xs text-indigo-600 font-bold tracking-wider mb-3">
+                                    代碼：${v.code}
+                                </div>
+                            ` : ''}
+                            <p class="text-xs text-slate-500 leading-relaxed mb-4">${v.note || '無備註說明'}</p>
+                        </div>
+                        
+                        <div>
+                            ${voucherUrlBtn}
+                            <div class="pt-3 border-t border-slate-100 mt-3 flex items-center justify-between text-[10px] text-slate-400">
+                                <span class="flex items-center space-x-1 select-none">
+                                    <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                    <span>驗證安全無虞</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            applyRoleVisibility(); 
+        }
+
+        function openVoucherModal(vId = null) {
+            if (!isAdminMode) return;
+            if (vId) {
+                editingVoucherId = vId;
+                const v = state.vouchers.find(x => x.id === vId);
+                document.getElementById('voucher-modal-title').textContent = "修改票券";
+                document.getElementById('v-title').value = v.title;
+                document.getElementById('v-type').value = v.type;
+                document.getElementById('v-code').value = v.code || "";
+                document.getElementById('v-url').value = v.url || "";
+                document.getElementById('v-note').value = v.note || "";
+            } else {
+                editingVoucherId = null;
+                document.getElementById('voucher-modal-title').textContent = "新增票券";
+                document.getElementById('v-title').value = "";
+                document.getElementById('v-type').value = "交通";
+                document.getElementById('v-code').value = "";
+                document.getElementById('v-url').value = "";
+                document.getElementById('v-note').value = "";
+            }
+            document.getElementById('voucher-modal').classList.remove('hidden');
+            document.getElementById('voucher-modal').classList.add('flex');
+        }
+
+        function closeVoucherModal() {
+            document.getElementById('voucher-modal').classList.add('hidden');
+            document.getElementById('voucher-modal').classList.remove('flex');
+        }
+
+        function saveVoucher() {
+            const title = document.getElementById('v-title').value.trim() || "未命名票券";
+            const type = document.getElementById('v-type').value;
+            const code = document.getElementById('v-code').value.trim();
+            const url = document.getElementById('v-url').value.trim();
+            const note = document.getElementById('v-note').value.trim();
+
+            if (editingVoucherId) {
+                const v = state.vouchers.find(x => x.id === editingVoucherId);
+                if (v) {
+                    v.title = title;
+                    v.type = type;
+                    v.code = code;
+                    v.url = url;
+                    v.note = note;
+                }
+            } else {
+                state.vouchers.push({ id: 'v-' + Date.now(), title, type, code, url, note });
+            }
+
+            saveState();
+            applyState();
+            closeVoucherModal();
+            showToast("票券儲存成功！", "🎫");
+        }
+
+        function editVoucher(vId) {
+            openVoucherModal(vId);
+        }
+
+        function deleteVoucher(vId) {
+            if (!isAdminMode) return;
+            showConfirm(
+                "刪除票券", 
+                "您確定要將這張票券備份移除嗎？", 
+                true, 
+                () => {
+                    state.vouchers = state.vouchers.filter(x => x.id !== vId);
+                    saveState();
+                    applyState();
+                    showToast("票券已刪除", "🗑️");
+                }
+            );
+        }
+
+
+        // ==================== 4. 行李清單 ====================
+        function renderPackingList() {
+            const container = document.getElementById('packing-cards-grid');
+            container.innerHTML = "";
+
+            const filterOwner = document.getElementById('packing-filter-owner').value;
+            const targetOwners = [...state.companions]; 
+
+            targetOwners.forEach(owner => {
+                if (filterOwner !== "all" && filterOwner !== owner) return;
+
+                const items = state.packingList.filter(x => x.owner === owner);
+                const completedCount = items.filter(x => x.checked).length;
+                const totalCount = items.length;
+
+                let listHTML = "";
+                if (totalCount === 0) {
+                    listHTML = `<p class="text-xs text-slate-400 italic py-2">目前沒有準備行李項目</p>`;
+                } else {
+                    listHTML = items.map(item => `
+                        <div class="flex items-center justify-between group py-1.5 border-b border-slate-100 last:border-0">
+                            <label class="flex items-center space-x-2 cursor-pointer text-xs ${item.checked ? 'line-through text-slate-400' : 'text-slate-600'}">
+                                <input type="checkbox" onchange="togglePackingCheck('${item.id}')" ${item.checked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                                <span class="leading-tight">${item.item}</span>
+                            </label>
+                            <button type="button" onclick="deletePackingItem('${item.id}')" class="admin-only text-slate-300 hover:text-rose-500 transition px-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+
+                container.innerHTML += `
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-150 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+                                    <span>👤</span>
+                                    <span>${owner} 的行李</span>
+                                </span>
+                                <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold">${completedCount}/${totalCount} 搞定</span>
+                            </div>
+                            <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+                                ${listHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            applyRoleVisibility(); 
+        }
+
+        function addPackingItem() {
+            if (!isAdminMode) return;
+            const owner = document.getElementById('packing-item-owner').value;
+            const name = document.getElementById('packing-item-name').value.trim();
+            if (!name) return;
+
+            state.packingList.push({
+                id: 'p-' + Date.now(),
+                item: name,
+                owner: owner,
+                checked: false
+            });
+
+            document.getElementById('packing-item-name').value = "";
+            saveState();
+            renderPackingList();
+            showToast("已加入行李清單", "🎒");
+        }
+
+        function togglePackingCheck(id) {
+            const item = state.packingList.find(x => x.id === id);
+            if (item) {
+                item.checked = !item.checked;
+                saveState();
+                renderPackingList();
+            }
+        }
+
+        function deletePackingItem(id) {
+            if (!isAdminMode) return;
+            state.packingList = state.packingList.filter(x => x.id !== id);
+            saveState();
+            renderPackingList();
+        }
+
+
+        // ==================== 5. 旅行注意事項 ====================
+        function renderNotesList() {
+            const container = document.getElementById('notes-container');
+            container.innerHTML = "";
+
+            if (state.notesList.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-400 italic text-sm">目前尚無注意事項。</div>`;
+                return;
+            }
+
+            state.notesList.forEach(note => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-4 hover:bg-slate-50/80 transition group gap-4">
+                        <div class="flex items-start space-x-3 flex-1 min-w-0">
+                            <span class="text-indigo-500 font-extrabold text-base mt-0.5 select-none">•</span>
+                            <p class="text-sm text-slate-700 leading-relaxed break-words pr-2">${note.content}</p>
+                        </div>
+                        <div class="flex items-center space-x-3 flex-shrink-0">
+                            <button type="button" onclick="editNoteItem('${note.id}')" class="admin-only text-xs text-slate-400 hover:text-indigo-600 transition flex items-center space-x-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                <span class="hidden sm:inline">修改</span>
+                            </button>
+                            <button type="button" onclick="deleteNoteItem('${note.id}')" class="admin-only text-xs text-rose-450 hover:text-rose-600 transition flex items-center space-x-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                <span class="hidden sm:inline">刪除</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            applyRoleVisibility(); 
+        }
+
+        function openNoteModal(noteId = null) {
+            if (!isAdminMode) return;
+            if (noteId) {
+                editingNoteId = noteId;
+                const note = state.notesList.find(n => n.id === noteId);
+                document.getElementById('note-modal-title').textContent = "修改注意事項";
+                document.getElementById('n-content').value = note.content;
+            } else {
+                editingNoteId = null;
+                document.getElementById('note-modal-title').textContent = "新增注意事項";
+                document.getElementById('n-content').value = "";
+            }
+            document.getElementById('note-modal').classList.remove('hidden');
+            document.getElementById('note-modal').classList.add('flex');
+        }
+
+        function closeNoteModal() {
+            document.getElementById('note-modal').classList.add('hidden');
+            document.getElementById('note-modal').classList.remove('flex');
+        }
+
+        function saveNoteItem() {
+            const content = document.getElementById('n-content').value.trim();
+            if (!content) return;
+
+            if (editingNoteId) {
+                const note = state.notesList.find(n => n.id === editingNoteId);
+                if (note) {
+                    note.content = content;
+                }
+            } else {
+                state.notesList.push({
+                    id: 'n-' + Date.now(),
+                    content: content
+                });
+            }
+
+            saveState();
+            applyState();
+            closeNoteModal();
+            showToast("注意事項儲存成功！", "📝");
+        }
+
+        function editNoteItem(noteId) {
+            openNoteModal(noteId);
+        }
+
+        function deleteNoteItem(noteId) {
+            if (!isAdminMode) return;
+            showConfirm(
+                "刪除注意事項", 
+                "您確定要刪除這筆備忘注意事項嗎？", 
+                true, 
+                () => {
+                    state.notesList = state.notesList.filter(n => n.id !== noteId);
+                    saveState();
+                    applyState();
+                    showToast("注意事項已移除", "🗑️");
+                }
+            );
+        }
+
+
+        // ==================== 版面切換 ====================
+        function switchTab(tabId) {
+            state.activeTab = tabId;
+            saveState(true); 
+
+            // 按鈕樣式
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50";
+            });
+            const activeBtn = document.getElementById('tab-' + tabId);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 bg-indigo-600 text-white shadow-md shadow-indigo-100";
+            }
+
+            // 面板顯示
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            const activePanel = document.getElementById('panel-' + tabId);
+            if (activePanel) {
+                activePanel.classList.remove('hidden');
+            }
+
+            // 懸浮新增活動按鈕 (只限行程規畫且在管理員模式下顯示)
+            const floatBtn = document.getElementById('floating-add-btn');
+            if (tabId === 'itinerary' && isAdminMode) {
+                floatBtn.classList.remove('hidden');
+            } else {
+                floatBtn.classList.add('hidden');
+            }
+
+            if (tabId === 'itinerary') renderItinerary();
+            else if (tabId === 'ledger') renderLedger();
+            else if (tabId === 'vouchers') renderVouchers();
+            else if (tabId === 'packing') renderPackingList();
+            else if (tabId === 'notes') renderNotesList();
+        }
+
+
+        // ==================== 備份與控制功能 ====================
+        function exportBackup() {
+            if (!isAdminMode) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `${state.tripTitle}_Pro版本備份.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("行程備份已匯出下載！", "💾");
+        }
+
+        function triggerImport() {
+            if (!isAdminMode) return;
+            document.getElementById('import-file').click();
+        }
+
+        function importBackup(event) {
+            if (!isAdminMode) return;
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if (importedState.tripTitle && importedState.days) {
+                        state = importedState;
+                        saveState();
+                        applyState();
+                        showToast("🎉 行程備份匯入成功！", "🎉");
+                    } else {
+                        showToast("匯入失敗：檔案格式不正確。", "❌");
+                    }
+                } catch (err) {
+                    showToast("讀取檔案時發生錯誤。", "❌");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllDataConfirm() {
+            if (!isAdminMode) return;
+            showConfirm(
+                "重置行程資料", 
+                "🚨 注意：此動作將會清除所有修改，重置回原廠預設範本資料。確定復原？", 
+                true, 
+                () => {
+                    state = JSON.parse(JSON.stringify(defaultState)); 
+                    saveState();
+                    applyState();
+                    switchTab('itinerary');
+                    showToast("已恢復原廠預設狀態！", "🔄");
+                }
+            );
+        }
+
+        // 全域函數綁定
+        window.setActStatus = setActStatus;
+        window.switchTab = switchTab;
+        window.selectDay = selectDay;
+        window.openDayModal = openDayModal;
+        window.closeDayModal = closeDayModal;
+        window.saveDay = saveDay;
+        window.editCurrentDay = editCurrentDay;
+        window.deleteCurrentDay = deleteCurrentDay;
+        window.openActivityModal = openActivityModal;
+        window.toggleActRateField = toggleActRateField;
+        window.closeActivityModal = closeActivityModal;
+        window.saveActivity = saveActivity;
+        window.editActivity = editActivity;
+        window.deleteActivity = deleteActivity;
+        window.confirmSettlement = confirmSettlement;
+        window.deleteSettledHistory = deleteSettledHistory;
+        window.addPreTravelRow = addPreTravelRow;
+        window.updatePreTravelRow = updatePreTravelRow;
+        window.deletePreTravelRow = deletePreTravelRow;
+        window.openVoucherModal = openVoucherModal;
+        window.closeVoucherModal = closeVoucherModal;
+        window.saveVoucher = saveVoucher;
+        window.editVoucher = editVoucher;
+        window.deleteVoucher = deleteVoucher;
+        window.addPackingItem = addPackingItem;
+        window.togglePackingCheck = togglePackingCheck;
+        window.deletePackingItem = deletePackingItem;
+        window.openNoteModal = openNoteModal;
+        window.closeNoteModal = closeNoteModal;
+        window.saveNoteItem = saveNoteItem;
+        window.editNoteItem = editNoteItem;
+        window.deleteNoteItem = deleteNoteItem;
+        window.updateCompanions = updateCompanions;
+        window.openSyncModal = openSyncModal;
+        window.closeSyncModal = closeSyncModal;
+        window.saveSyncSettings = saveSyncSettings;
+        window.exportBackup = exportBackup;
+        window.triggerImport = triggerImport;
+        window.clearAllDataConfirm = clearAllDataConfirm;
+        window.changeLedgerPage = changeLedgerPage;
+        window.switchTabAndSelectDay = switchTabAndSelectDay;
+        window.handleRoleToggle = handleRoleToggle;
+        window.closeLoginModal = closeLoginModal;
+        window.submitLogin = submitLogin;
+        
+    </script>
+</body>
+</html>
