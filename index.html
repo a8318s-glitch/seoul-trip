@@ -37,7 +37,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col font-sans">
 
     <!-- 頂部導航欄 (極致美化，RWD 奢華自適應) -->
     <header class="bg-white/95 backdrop-blur-md border-b border-slate-150 sticky top-0 z-40 shadow-sm">
@@ -79,7 +79,7 @@
                 </div>
             </div>
 
-            <!-- 下半部：後台管理工具列 (手機端自動橫向滑動滑軌，避免擠壓) -->
+            <!-- 下半部：後台管理工具列 -->
             <div id="admin-sub-header" class="admin-only hidden border-t border-slate-100 py-2.5 flex items-center justify-end gap-2 overflow-x-auto scrollbar-none">
                 <span class="text-[10px] text-slate-400 font-extrabold mr-auto hidden md:inline-block">🛠️ 管理員控制面板：</span>
                 <button type="button" onclick="exportBackup()" class="flex items-center space-x-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex-shrink-0 shadow-sm border border-indigo-100">
@@ -199,7 +199,7 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-indigo-100 mb-1">付款人</label>
-                        <select id="quick-item-payer" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                        <select id="quick-item-payer" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-semibold text-slate-800">
                             <!-- 動態載入成員 -->
                         </select>
                     </div>
@@ -213,18 +213,18 @@
                     <div class="grid grid-cols-3 gap-1 lg:col-span-2">
                         <div class="col-span-1">
                             <label class="block text-[11px] font-bold text-indigo-100 mb-1">幣別</label>
-                            <select id="quick-item-currency" onchange="toggleQuickRateField(this.value)" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                            <select id="quick-item-currency" onchange="toggleQuickRateField(this.value)" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-semibold text-slate-800">
                                 <option value="TWD">TWD</option>
                                 <option value="KRW" selected>KRW</option>
                             </select>
                         </div>
                         <div class="col-span-1">
                             <label class="block text-[11px] font-bold text-indigo-100 mb-1">金額</label>
-                            <input type="number" id="quick-item-price" placeholder="10000" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-bold">
+                            <input type="number" id="quick-item-price" placeholder="10000" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-bold text-slate-800">
                         </div>
                         <div class="col-span-1">
                             <label class="block text-[11px] font-bold text-indigo-100 mb-1">匯率</label>
-                            <input type="number" step="0.0001" id="quick-item-rate" value="0.0241" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-mono font-bold">
+                            <input type="number" step="0.0001" id="quick-item-rate" value="0.0241" class="w-full bg-white border border-transparent rounded-xl p-2.5 text-xs focus:outline-none font-mono font-bold text-slate-800">
                         </div>
                     </div>
                 </div>
@@ -232,6 +232,31 @@
                     <button type="button" onclick="submitQuickExpense()" class="bg-white hover:bg-indigo-50 text-indigo-600 font-bold px-6 py-2 rounded-xl text-xs transition shadow flex items-center space-x-1">
                         <span>📥 立即記帳</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- 💰 旅程消費分析看板 (動態反應個人自付與分帳總額) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-150 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">📊 旅程總支出 (台幣)</p>
+                        <h3 id="stats-total-spent" class="text-xl sm:text-2xl font-black text-indigo-600 mt-1">NT$ 0</h3>
+                    </div>
+                    <div class="bg-indigo-50 text-indigo-600 p-3 rounded-xl font-bold text-lg select-none">💳</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-150 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">👥 共同分帳總支出</p>
+                        <h3 id="stats-shared-spent" class="text-xl sm:text-2xl font-black text-orange-600 mt-1">NT$ 0</h3>
+                    </div>
+                    <div class="bg-orange-50 text-orange-600 p-3 rounded-xl font-bold text-lg select-none">👥</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-150 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">👤 個人自付總支出</p>
+                        <h3 id="stats-personal-spent" class="text-xl sm:text-2xl font-black text-purple-600 mt-1">NT$ 0</h3>
+                    </div>
+                    <div class="bg-purple-50 text-purple-600 p-3 rounded-xl font-bold text-lg select-none">👤</div>
                 </div>
             </div>
 
@@ -288,8 +313,8 @@
                 </div>
             </div>
 
-            <!-- 記帳明細區塊 (自適應排版：防左右滾動設計) -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+            <!-- 記帳明細區塊 (包含全新動態篩選控制項、高適應無瑕疵表格) -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-150">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                     <div>
                         <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
@@ -297,7 +322,7 @@
                             <span>記帳明細</span>
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-1 font-medium">
-                            提示：外幣欄位之匯率皆已開放編輯。未登入時記帳明細為唯讀鎖定狀態。
+                            提示：未登入瀏覽時，記帳明細表格全面以「高質感統一純文字」呈現，避免邊框與字型落差。
                         </p>
                     </div>
                     <button type="button" onclick="addPreTravelRow()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-100 transition flex items-center space-x-1 self-start sm:self-auto flex-shrink-0">
@@ -305,25 +330,49 @@
                         <span>新增記帳項目</span>
                     </button>
                 </div>
+
+                <!-- 🔍 全新動態篩選控制項 (完美篩選個人與分帳總金額) -->
+                <div class="bg-slate-50 border border-slate-150 p-4 rounded-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="text-xs font-black text-slate-500 flex items-center space-x-1">
+                            <span>🔍</span><span>條件篩選：</span>
+                        </span>
+                        <!-- 篩選花費種類 -->
+                        <select id="filter-ledger-type" onchange="handleLedgerFilterChange()" class="bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <option value="all">📁 所有花費種類 (分帳 + 個人自付)</option>
+                            <option value="shared">👥 僅顯示「分帳」項目</option>
+                            <option value="personal">👤 僅顯示「個人自付」項目</option>
+                        </select>
+                        <!-- 篩選付款人 -->
+                        <select id="filter-ledger-member" onchange="handleLedgerFilterChange()" class="bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <!-- 動態載入 -->
+                        </select>
+                    </div>
+                    <!-- 所選篩選金額小計 -->
+                    <div class="bg-indigo-50/50 border border-indigo-100 px-4 py-2 rounded-lg flex items-center justify-between md:justify-end space-x-3 text-xs font-black text-slate-600">
+                        <span>所選小計金額：</span>
+                        <span id="filtered-subtotal-twd" class="text-indigo-600 text-sm font-extrabold">NT$ 0</span>
+                    </div>
+                </div>
                 
-                <!-- 桌機與平板大螢幕檢視：不左右滑動的高適應表格 -->
+                <!-- 桌機與平板大螢幕檢視：不左右滑動的高適應表格 (欄位寬度經精密調整) -->
                 <div class="hidden md:block overflow-hidden rounded-xl border border-slate-200">
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50/70 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider select-none">
-                                <th class="py-3 px-3 w-[13%]">日期</th>
+                                <th class="py-3 px-3 w-[12%]">日期</th>
                                 <th class="py-3 px-3 w-[20%]">消費品項</th>
                                 <th class="py-3 px-3 w-[10%]">付款人</th>
                                 <th class="py-3 px-3 w-[12%]">分帳類型</th>
-                                <th class="py-3 px-3 w-[8%] text-center">數量</th>
+                                <th class="py-3 px-3 w-[6%] text-center">數量</th>
                                 <th class="py-3 px-3 w-[10%] text-right">金額</th>
-                                <th class="py-3 px-3 w-[8%] text-center">幣別</th>
+                                <th class="py-3 px-3 w-[6%] text-center">幣別</th>
                                 <th class="py-3 px-3 w-[10%] text-right">匯率</th>
-                                <th class="py-3 px-3 w-[12%] text-right text-slate-900 font-bold">台幣總計</th>
-                                <th class="py-3 px-3 w-[8%] text-center">操作</th>
+                                <th class="py-3 px-3 w-[10%] text-right text-slate-900 font-bold">台幣總計</th>
+                                <th class="py-3 px-3 w-[4%] text-center">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="pretravel-table-body" class="text-xs divide-y divide-slate-100">
+                        <tbody id="pretravel-table-body" class="text-xs divide-y divide-slate-100 font-medium">
                             <!-- 動態渲染行程與費用 -->
                         </tbody>
                     </table>
@@ -373,7 +422,7 @@
                         <span class="mx-2">|</span>
                         
                         <span>篩選顯示:</span>
-                        <select id="packing-filter-owner" onchange="renderPackingList()" class="bg-slate-50 border border-slate-200 rounded-lg p-1.5 focus:outline-none">
+                        <select id="packing-filter-owner" onchange="renderPackingList()" class="bg-slate-50 border border-slate-200 rounded-lg p-1.5 focus:outline-none text-slate-800 font-bold">
                             <option value="all">顯示所有人的清單</option>
                         </select>
                     </div>
@@ -389,7 +438,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1.5">準備物品 / 備忘事項</label>
-                        <input type="text" id="packing-item-name" placeholder="例如：護照正本、行動電源..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="packing-item-name" placeholder="例如：護照正本、行動電源..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 font-semibold">
                     </div>
                     <div>
                         <button type="button" onclick="addPackingItem()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center space-x-1 shadow-md">
@@ -523,11 +572,11 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">天數標題</label>
-                    <input type="text" id="day-title-input" placeholder="例如：抵達與明洞逛街" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                    <input type="text" id="day-title-input" placeholder="例如：抵達與明洞逛街" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">日期</label>
-                    <input type="date" id="day-date-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="date" id="day-date-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 font-bold">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeDayModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 text-sm hover:bg-slate-50">取消</button>
@@ -545,11 +594,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">時間 (HH:MM)</label>
-                        <input type="text" id="act-time" placeholder="例如：13:30" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                        <input type="text" id="act-time" placeholder="例如：13:30" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">活動類型</label>
-                        <select id="act-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                        <select id="act-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
                             <option value="transport">交通 🚌</option>
                             <option value="lodging">住宿 🏨</option>
                             <option value="food">美食 🍕</option>
@@ -560,25 +609,25 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">活動/地點名稱</label>
-                    <input type="text" id="act-title" placeholder="例如：仁川機場搭乘 AREX 直達首爾站" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                    <input type="text" id="act-title" placeholder="例如：仁川機場搭乘 AREX 直達首爾站" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">詳細說明/攻略</label>
-                    <textarea id="act-desc" placeholder="搭乘機場快線直達..." class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold"></textarea>
+                    <textarea id="act-desc" placeholder="搭乘機場快線直達..." class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800"></textarea>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-slate-500">子步驟/詳細時間點</label>
                         <span class="text-[10px] text-slate-400">格式：13:30 入境大廳</span>
                     </div>
-                    <textarea id="act-substeps" placeholder="13:30 入境大廳 B1&#10;13:45 至自動售票機憑 QR Code 兌換實體票" class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono font-semibold"></textarea>
+                    <textarea id="act-substeps" placeholder="13:30 入境大廳 B1&#10;13:45 至自動售票機憑 QR Code 兌換實體票" class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono font-semibold text-slate-800"></textarea>
                 </div>
                 
                 <!-- 活動行程內費用設定 -->
                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                     <div class="col-span-1">
                         <label class="block text-xs font-bold text-slate-500 mb-1">付款人</label>
-                        <select id="act-cost-payer" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                        <select id="act-cost-payer" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-semibold text-slate-800">
                             <!-- 動態載入 -->
                         </select>
                     </div>
@@ -591,29 +640,29 @@
                     </div>
                     <div class="col-span-1">
                         <label class="block text-xs font-bold text-slate-500 mb-1">幣別</label>
-                        <select id="act-cost-currency" onchange="toggleActRateField(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
+                        <select id="act-cost-currency" onchange="toggleActRateField(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none font-semibold text-slate-800">
                             <option value="TWD">TWD</option>
                             <option value="KRW">KRW</option>
                         </select>
                     </div>
                     <div class="col-span-1">
                         <label class="block text-xs font-bold text-slate-500 mb-1">金額</label>
-                        <input type="number" id="act-cost-amount" placeholder="金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold">
+                        <input type="number" id="act-cost-amount" placeholder="金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold text-slate-800">
                     </div>
                     <div class="col-span-1">
                         <label class="block text-xs font-bold text-slate-500 mb-1">該筆匯率</label>
-                        <input type="number" step="0.0001" id="act-cost-rate" placeholder="1.0" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono">
+                        <input type="number" step="0.0001" id="act-cost-rate" placeholder="1.0" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-slate-850 font-bold">
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">Google地圖網址</label>
-                        <input type="text" id="act-map-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <input type="text" id="act-map-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">憑證/QR代碼網址</label>
-                        <input type="text" id="act-voucher-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <input type="text" id="act-voucher-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
                     </div>
                 </div>
             </div>
@@ -631,12 +680,12 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">票券名稱</label>
-                    <input type="text" id="v-title" placeholder="例如：AREX 機場快線電子票" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                    <input type="text" id="v-title" placeholder="例如：AREX 機場快線電子票" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-850">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">類別</label>
-                        <select id="v-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                        <select id="v-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-850">
                             <option value="交通">交通 🚌</option>
                             <option value="住宿">住宿 🏨</option>
                             <option value="門票">門票 🎟️</option>
@@ -646,16 +695,16 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">代碼/序號 (選填)</label>
-                        <input type="text" id="v-code" placeholder="QR-12345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold">
+                        <input type="text" id="v-code" placeholder="QR-12345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-850">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">憑證連結 / 網址 (選填)</label>
-                    <input type="text" id="v-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="text" id="v-url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">備註/換票規則說明</label>
-                    <textarea id="v-note" placeholder="至自動售票機憑 QR Code 兌換實體車票" class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold"></textarea>
+                    <textarea id="v-note" placeholder="至自動售票機憑 QR Code 兌換實體車票" class="w-full h-20 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800"></textarea>
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100 mt-4">
@@ -672,7 +721,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">注意事項內容 / 備忘攻略</label>
-                    <textarea id="n-content" placeholder="請在此填寫重要備份..." class="w-full h-36 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold"></textarea>
+                    <textarea id="n-content" placeholder="請在此填寫重要備份..." class="w-full h-36 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800"></textarea>
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100 mt-4">
@@ -801,8 +850,10 @@
         let editingVoucherId = null;
         let editingNoteId = null;
 
-        // 記帳明細頁碼狀態
+        // 記帳明細頁碼狀態與動態篩選狀態
         let currentLedgerPage = 1;
+        let ledgerFilterType = "all"; // all, shared, personal
+        let ledgerFilterMember = "all"; // all, or member name
 
         // ==================== 💎 自訂 UI 跳窗通知模組 ====================
         function showToast(text, icon = "✨") {
@@ -1046,7 +1097,7 @@
             document.getElementById('login-modal').classList.remove('flex');
         }
 
-        // 安全登入驗證
+        // 安全登入驗證 (優先進行 admin/123 本地絕對成功檢查，徹底排除 GAS 連線 CORS 超時等問題)
         async function submitLogin() {
             const user = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
@@ -1057,16 +1108,14 @@
                 return;
             }
 
-            const loginVerifyLocal = () => {
-                if (user === "admin" && pass === "123") {
-                    loginSuccess(user, pass, rememberEnabled);
-                } else {
-                    document.getElementById('login-error-msg').classList.remove('hidden');
-                }
-            };
+            // 💡 優先檢驗本機備用管理員帳密：只要是 admin / 123 即可 100% 成功，不因 Apps Script 載入異常而失敗！
+            if (user === "admin" && pass === "123") {
+                loginSuccess(user, pass, rememberEnabled);
+                return;
+            }
 
             if (!state.googleScriptUrl) {
-                loginVerifyLocal();
+                document.getElementById('login-error-msg').classList.remove('hidden');
                 return;
             }
 
@@ -1075,7 +1124,7 @@
             text.textContent = "驗證身分中...";
 
             try {
-                // 透過 Apps Script 進行安全端點比對
+                // 透過 Apps Script 進行雲端帳密端點比對
                 const response = await fetch(state.googleScriptUrl + "?action=loginVerify&user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass));
                 const result = await response.json();
                 
@@ -1086,7 +1135,8 @@
                     text.textContent = prevText;
                 }
             } catch (err) {
-                loginVerifyLocal();
+                // 當 Google 雲端 API 發生跨網域 CORS 安全阻擋時，退回本機提示並提醒改用預設
+                document.getElementById('login-error-msg').classList.remove('hidden');
                 text.textContent = prevText;
             }
         }
@@ -1110,7 +1160,7 @@
             showToast("管理權限驗證成功！已為您保持自動解鎖。", "🔓");
         }
 
-        // 下拉選單載入
+        // 下拉選單與條件篩選器載入
         function populateDropdowns() {
             const itemOwnerSelect = document.getElementById('packing-item-owner');
             if (itemOwnerSelect) {
@@ -1151,6 +1201,17 @@
                     quickPayerSelect.innerHTML += `<option value="${c}">👤 ${c}</option>`;
                 });
                 quickPayerSelect.value = currentQuickVal || state.companions[0];
+            }
+
+            // 🔍 全新記帳明細付款人篩選 dropdown
+            const filterLedgerMemberSelect = document.getElementById('filter-ledger-member');
+            if (filterLedgerMemberSelect) {
+                const currentMemberFilterVal = filterLedgerMemberSelect.value;
+                filterLedgerMemberSelect.innerHTML = `<option value="all">👥 所有成員 (不限付款人)</option>`;
+                state.companions.forEach(c => {
+                    filterLedgerMemberSelect.innerHTML += `<option value="${c}">👤 付款人: ${c}</option>`;
+                });
+                filterLedgerMemberSelect.value = currentMemberFilterVal || "all";
             }
         }
 
@@ -1202,7 +1263,7 @@
                 
                 await fetch(state.googleScriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors', // 💡 採用 no-cors 可以在沙盒環境下成功送出 POST 請求，避開嚴格的 CORS 阻擋
+                    mode: 'no-cors', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(state),
                     signal: controller.signal
@@ -1242,10 +1303,9 @@
                     applyState();
                 }
             } catch (err) {
-                // 捕獲 CORS 或連線失敗，進行異常指數級退避，避免主線程報錯
                 consecutiveFetchFailures++;
                 if (consecutiveFetchFailures >= 3) {
-                    isSyncPausedDueToError = true; // 鎖定為本機模式，避免重複 fetch 報錯
+                    isSyncPausedDueToError = true; 
                 }
                 updateSyncStatusUI();
             }
@@ -1284,7 +1344,6 @@
             }
         }
 
-        // 清除同步網址，退回純本機模式
         function clearSyncUrl() {
             state.googleScriptUrl = "";
             isSyncPausedDueToError = false;
@@ -1395,7 +1454,7 @@
                 let subStepsHTML = "";
                 if (act.subSteps && act.subSteps.length > 0) {
                     subStepsHTML = `
-                        <div class="mt-4 border border-indigo-50 bg-indigo-50/20 p-3.5 rounded-xl space-y-2">
+                        <div class="mt-4 border border-indigo-50 bg-indigo-50/20 p-3.5 rounded-xl space-y-2 font-sans">
                             ${act.subSteps.map(step => `
                                 <div class="flex items-start text-xs leading-5">
                                     <span class="font-bold text-indigo-600 min-w-[45px]">${step.time}</span>
@@ -1701,7 +1760,6 @@
             openActivityModal(actId);
         }
 
-        // 行程活動中更新匯率
         function updateItineraryRate(dayIndex, activityId, value) {
             const rate = parseFloat(value) || 1.0;
             const day = state.days[dayIndex];
@@ -1710,7 +1768,7 @@
                 if (act && act.cost) {
                     act.cost.rate = rate;
                     saveState();
-                    applyState(); // 重算所有共同付款與分帳
+                    applyState(); 
                     showToast("行程匯率已即時更新並重算！", "💱");
                 }
             }
@@ -1735,7 +1793,6 @@
 
         // ==================== 2. 財務記帳 & 分帳 ====================
         
-        // 快速記帳面板幣別切換防呆
         function toggleQuickRateField(currency) {
             const rateInput = document.getElementById('quick-item-rate');
             if (currency === "TWD") {
@@ -1749,7 +1806,6 @@
             }
         }
 
-        // 提交快速記帳 (自動寫入今日當日日期)
         function submitQuickExpense() {
             const item = document.getElementById('quick-item-name').value.trim();
             const payer = document.getElementById('quick-item-payer').value;
@@ -1767,10 +1823,8 @@
                 return;
             }
 
-            // 🎯 新規格：記帳時自動以當日日期紀錄 (格式為 YYYY-MM-DD)
             const todayDate = new Date().toISOString().split('T')[0];
 
-            // 新增至行前費用/記帳明細列表
             state.preTravelExpenses.push({
                 id: 'pre-' + Date.now(),
                 date: todayDate, 
@@ -1783,7 +1837,6 @@
                 isPersonal: isPersonal
             });
 
-            // 清空輸入欄位
             document.getElementById('quick-item-name').value = "";
             document.getElementById('quick-item-price').value = "";
             
@@ -1792,24 +1845,45 @@
             showToast(`記帳成功！已紀錄於當日 ${todayDate}`, "🎉");
         }
 
+        // 動態過濾記帳篩選
+        function handleLedgerFilterChange() {
+            ledgerFilterType = document.getElementById('filter-ledger-type').value;
+            ledgerFilterMember = document.getElementById('filter-ledger-member').value;
+            renderCombinedDetailsTable();
+        }
+
         function renderLedger() {
             const payments = {};
             state.companions.forEach(c => {
                 payments[c] = { sharedTwd: 0, rawKrw: 0 };
             });
 
+            // 💰 用於動態統計看板的變數
+            let totalSpentTwd = 0;
+            let totalSharedSpentTwd = 0;
+            let totalPersonalSpentTwd = 0;
+
             // A. 行前與個人快速記帳加總
             state.preTravelExpenses.forEach(exp => {
-                const payer = exp.payer;
                 const totalCost = (parseFloat(exp.price) || 0) * (parseInt(exp.qty) || 0);
                 const rate = parseFloat(exp.rate) || 1.0;
                 const isPersonal = exp.isPersonal === true;
+                const costInTwd = totalCost * rate;
 
+                // 進行「總支出分析看板」累加
+                totalSpentTwd += costInTwd;
+                if (isPersonal) {
+                    totalPersonalSpentTwd += costInTwd;
+                } else {
+                    totalSharedSpentTwd += costInTwd;
+                }
+
+                const payer = exp.payer;
                 if (payments[payer] !== undefined) {
                     if (!isPersonal) {
                         if (exp.currency === "KRW") {
                             payments[payer].rawKrw += totalCost;
-                            payments[payer].sharedTwd += totalCost * rate;
+                            payments[payer].sharedTwd += costInTwd;
                         } else {
                             payments[payer].sharedTwd += totalCost;
                         }
@@ -1821,17 +1895,25 @@
             state.days.forEach(day => {
                 day.activities.forEach(act => {
                     if (act.cost && act.cost.payer && act.cost.amount) {
-                        const payer = act.cost.payer;
                         const amount = parseFloat(act.cost.amount) || 0;
                         const rate = parseFloat(act.cost.rate) || 1.0; 
-                        const currency = act.cost.currency || "TWD";
+                        const costInTwd = amount * rate;
                         const isPersonal = act.cost.isPersonal === true;
 
+                        // 進行「總支出分析看板」累加
+                        totalSpentTwd += costInTwd;
+                        if (isPersonal) {
+                            totalPersonalSpentTwd += costInTwd;
+                        } else {
+                            totalSharedSpentTwd += costInTwd;
+                        }
+
+                        const payer = act.cost.payer;
                         if (payments[payer] !== undefined) {
                             if (!isPersonal) {
-                                if (currency === "KRW") {
+                                if (act.cost.currency === "KRW") {
                                     payments[payer].rawKrw += amount;
-                                    payments[payer].sharedTwd += amount * rate;
+                                    payments[payer].sharedTwd += costInTwd;
                                 } else {
                                     payments[payer].sharedTwd += amount;
                                 }
@@ -1841,7 +1923,12 @@
                 });
             });
 
-            // 渲染團員已付共同款卡片
+            // 🎯 即時渲染「旅程消費統計看板」
+            document.getElementById('stats-total-spent').textContent = `NT$ ${Math.round(totalSpentTwd).toLocaleString()}`;
+            document.getElementById('stats-shared-spent').textContent = `NT$ ${Math.round(totalSharedSpentTwd).toLocaleString()}`;
+            document.getElementById('stats-personal-spent').textContent = `NT$ ${Math.round(totalPersonalSpentTwd).toLocaleString()}`;
+
+            // 渲染團員已付共同款卡片 (分帳)
             const cardsContainer = document.getElementById('companions-payment-cards');
             cardsContainer.innerHTML = "";
             state.companions.forEach(c => {
@@ -1919,7 +2006,7 @@
             const activeTransactions = rawTransactions.filter(t => !state.settledHistory.some(h => h.id === t.id));
 
             if (activeTransactions.length === 0) {
-                settlementList.innerHTML = `<div class="text-sm text-slate-400 py-4 text-center">🎉 目前所有款項已結清！</div>`;
+                settlementList.innerHTML = `<div class="text-sm text-slate-400 py-4 text-center">🎉 目前所有共同分帳款項已結清！</div>`;
             } else {
                 activeTransactions.forEach(t => {
                     settlementList.innerHTML += `
@@ -1947,7 +2034,7 @@
                             <span class="text-emerald-500 font-bold">✔</span>
                             <span class="text-xs"><strong>${h.from}</strong> 已匯給 <strong>${h.to}</strong> : <strong class="text-emerald-600">NT$ ${h.amount.toLocaleString()}</strong></span>
                         </div>
-                        <button type="button" onclick="deleteSettledHistory('${h.id}')" class="text-[10px] text-rose-500 hover:underline">撤銷</button>
+                        <button type="button" onclick="deleteSettledHistory('${h.id}')" class="text-[10px] text-rose-500 hover:underline font-bold">撤銷</button>
                     </div>
                 `).join('');
             }
@@ -1955,7 +2042,7 @@
             renderCombinedDetailsTable();
         }
 
-        // 合併記帳明細列表 (防擠壓自適應：未登入不可編輯，登入後日期/匯率等自由編輯)
+        // 合併與渲染記帳明細列表 (高度格式統一，前台純文字表格，後台可編輯輸入框，欄位寬度極致適中)
         function renderCombinedDetailsTable() {
             const tbody = document.getElementById('pretravel-table-body');
             const cardContainer = document.getElementById('pretravel-cards-container');
@@ -1971,7 +2058,7 @@
                     uniqueId: `pre-${exp.id || idx}`,
                     type: 'pretravel',
                     rawIndex: idx, 
-                    date: exp.date || "2026-06-14", // 預設安全日期
+                    date: exp.date || "2026-06-14",
                     item: exp.item,
                     payer: exp.payer,
                     qty: exp.qty,
@@ -2011,231 +2098,264 @@
             // 排序 (日期排序)
             allTx.sort((a, b) => a.date.localeCompare(b.date));
 
+            // 🎯 執行動態篩選 (種類與付款人過濾)
+            const filteredTx = allTx.filter(tx => {
+                // 付款人過濾
+                if (ledgerFilterMember !== "all" && tx.payer !== ledgerFilterMember) {
+                    return false;
+                }
+                // 花費種類過濾
+                if (ledgerFilterType === "shared" && tx.isPersonal === true) {
+                    return false;
+                }
+                if (ledgerFilterType === "personal" && tx.isPersonal === false) {
+                    return false;
+                }
+                return true;
+            });
+
+            // 🎯 即時渲染小計金額
+            const filteredSubtotal = filteredTx.reduce((sum, tx) => sum + tx.totalTwd, 0);
+            document.getElementById('filtered-subtotal-twd').textContent = `NT$ ${Math.round(filteredSubtotal).toLocaleString()}`;
+
+            // 分頁處理
             const itemsPerPage = 20;
-            const totalPages = Math.ceil(allTx.length / itemsPerPage) || 1;
+            const totalPages = Math.ceil(filteredTx.length / itemsPerPage) || 1;
             
             if (currentLedgerPage > totalPages) currentLedgerPage = totalPages;
             if (currentLedgerPage < 1) currentLedgerPage = 1;
 
             const startIndex = (currentLedgerPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            const paginatedTx = allTx.slice(startIndex, endIndex);
+            const paginatedTx = filteredTx.slice(startIndex, endIndex);
 
             if (paginatedTx.length === 0) {
-                const emptyHTML = `<div class="text-center py-8 text-slate-400 text-xs">目前無任何記帳明細。</div>`;
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400">目前無任何記帳明細。</td></tr>`;
-                cardContainer.innerHTML = emptyHTML;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-400 font-bold text-xs select-none">沒有符合當前篩選條件的帳目。</td></tr>`;
+                cardContainer.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs font-bold">沒有符合當前篩選條件的帳目。</div>`;
                 document.getElementById('ledger-pagination-container').innerHTML = "";
                 return;
             }
 
-            // 🎯 新規格：未登入時全部不可編輯 (鎖定防誤觸樣式)
-            const disabledAttr = !isAdminMode ? "disabled" : "";
-            
-            const inputClass = !isAdminMode 
-                ? "w-full bg-transparent border-transparent text-slate-800 font-bold p-1 text-xs focus:outline-none focus:ring-0 cursor-default select-all" 
-                : "w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 font-bold transition";
-            
-            const selectClass = !isAdminMode 
-                ? "w-full bg-transparent border-transparent text-slate-800 font-bold p-1 text-xs focus:outline-none focus:ring-0 appearance-none cursor-default" 
-                : "w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none font-semibold text-slate-800 transition";
+            const inputClass = "w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition font-sans";
+            const selectClass = "w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition font-sans";
 
             paginatedTx.forEach(tx => {
-                // 共用：生成付款人下拉選單
                 let payerOptions = "";
                 state.companions.forEach(c => {
-                    const selected = tx.payer === c ? "selected" : "";
-                    payerOptions += `<option value="${c}" ${selected}>${c}</option>`;
+                    payerOptions += `<option value="${c}" ${tx.payer === c ? "selected" : ""}>${c}</option>`;
                 });
 
-                // 操作按鈕 RWD / 唯讀狀態
-                const actionBtnHTML = isAdminMode ? `
-                    <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="text-rose-500 hover:text-rose-700 p-1 rounded transition">
-                        <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                ` : `
-                    <span class="text-slate-350 text-center block select-none">🔒</span>
-                `;
+                const isPersonalLabel = tx.isPersonal ? "👤 個人自付" : "👥 分帳";
+                const isPersonalClass = tx.isPersonal ? "text-purple-600 bg-purple-50" : "text-orange-600 bg-orange-50";
 
-                if (tx.type === 'pretravel') {
-                    // ================= 💻 1. 桌機版表格渲染 (行前費用與快速記帳) =================
-                    // 🎯 新規格：日期可以自由在後台修改，非後台顯示唯讀字串
-                    const dateCellHTML = isAdminMode ? `
-                        <input type="date" value="${tx.date}" onchange="updatePreTravelRow(${tx.rawIndex}, 'date', this.value)" class="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded-lg p-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 font-bold transition">
-                    ` : `
-                        <span class="text-xs font-bold text-slate-600 block px-1">${tx.date}</span>
-                    `;
+                // ================= 💻 1. 桌機版表格渲染 (高格式統一與自適應) =================
+                let rowHTML = "";
 
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 align-middle">
-                            <td class="py-2.5 px-3">${dateCellHTML}</td>
-                            <td class="py-2.5 px-3">
-                                <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" ${disabledAttr} class="${inputClass}">
-                            </td>
-                            <td class="py-2.5 px-3">
-                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" ${disabledAttr} class="${selectClass}">
-                                    ${payerOptions}
-                                </select>
-                            </td>
-                            <td class="py-2.5 px-3">
-                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" ${disabledAttr} class="${selectClass}">
-                                    <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 分帳</option>
-                                    <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人自付</option>
-                                </select>
-                            </td>
-                            <td class="py-2.5 px-3 text-center">
-                                <input type="number" value="${tx.qty}" onchange="updatePreTravelRow(${tx.rawIndex}, 'qty', this.value)" ${disabledAttr} class="${inputClass} text-center">
-                            </td>
-                            <td class="py-2.5 px-3">
-                                <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" ${disabledAttr} class="${inputClass} text-right">
-                            </td>
-                            <td class="py-2.5 px-3 text-center">
-                                <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" ${disabledAttr} class="${selectClass}">
-                                    <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
-                                    <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
-                                </select>
-                            </td>
-                            <td class="py-2.5 px-3 text-right">
-                                <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${tx.currency === 'TWD' || !isAdminMode ? 'disabled' : ''} class="w-full bg-slate-50 hover:bg-white text-right border border-slate-200 rounded-lg p-1.5 text-xs font-mono text-slate-800 font-bold transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-black text-slate-900 text-xs">
-                                NT$ ${Math.round(tx.totalTwd).toLocaleString()}
-                            </td>
-                            <td class="py-2.5 px-3 text-center">${actionBtnHTML}</td>
-                        </tr>
-                    `;
-
-                    // ================= 📱 2. 行動裝置卡片版渲染 (唯讀與編輯自適應) =================
-                    const deleteBtnMob = isAdminMode ? `
-                        <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="text-rose-500 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    ` : `
-                        <span class="text-[10px] text-slate-400 font-bold select-none">🔒 唯讀</span>
-                    `;
-
-                    const dateInputMob = isAdminMode ? `
-                        <input type="date" value="${tx.date}" onchange="updatePreTravelRow(${tx.rawIndex}, 'date', this.value)" class="bg-white border border-slate-200 rounded-lg p-1 text-xs font-bold text-slate-800">
-                    ` : `
-                        <span class="text-xs font-bold text-slate-600">${tx.date}</span>
-                    `;
-
-                    cardContainer.innerHTML += `
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col space-y-3 shadow-sm">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
-                                ${dateInputMob}
-                                ${deleteBtnMob}
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div class="col-span-2">
-                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">消費品項</label>
-                                    <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" ${disabledAttr} class="${inputClass} !bg-white !border-slate-200 !rounded-lg !p-2">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">付款人</label>
-                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" ${disabledAttr} class="${selectClass} !bg-white !border-slate-200 !rounded-lg !p-2">
+                if (isAdminMode) {
+                    // 🔓 後台編輯解鎖狀態
+                    if (tx.type === 'pretravel') {
+                        rowHTML = `
+                            <tr class="border-b border-slate-100 hover:bg-slate-50/50 align-middle">
+                                <td class="py-2.5 px-3">
+                                    <input type="date" value="${tx.date}" onchange="updatePreTravelRow(${tx.rawIndex}, 'date', this.value)" class="${inputClass}">
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" class="${inputClass}">
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" class="${selectClass}">
                                         ${payerOptions}
                                     </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">分帳類型</label>
-                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" ${disabledAttr} class="${selectClass} !bg-white !border-slate-200 !rounded-lg !p-2">
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" class="${selectClass}">
                                         <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 分帳</option>
-                                        <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人</option>
+                                        <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人自付</option>
                                     </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">幣別 / 金額</label>
-                                    <div class="flex space-x-1">
-                                        <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" ${disabledAttr} class="${selectClass} !bg-white !border-slate-200 !rounded-lg !p-1">
-                                            <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
-                                            <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
-                                        </select>
-                                        <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" ${disabledAttr} class="${inputClass} !bg-white !border-slate-200 !rounded-lg !p-1 text-right">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-slate-400 font-bold mb-0.5">匯率 (韓元開放)</label>
-                                    <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${tx.currency === 'TWD' || !isAdminMode ? 'disabled' : ''} class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-mono font-bold text-right text-slate-800 disabled:bg-slate-100 disabled:text-slate-400">
-                                </div>
-                            </div>
-                            <div class="border-t border-slate-200 pt-2 flex justify-between items-center text-xs">
-                                <span class="font-bold text-slate-500">數量: ${tx.qty}</span>
-                                <span class="font-extrabold text-indigo-600">台幣折算: NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
-                            </div>
-                        </div>
-                    `;
-
+                                </td>
+                                <td class="py-2.5 px-3 text-center">
+                                    <input type="number" value="${tx.qty}" onchange="updatePreTravelRow(${tx.rawIndex}, 'qty', this.value)" class="${inputClass} text-center">
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" class="${inputClass} text-right">
+                                </td>
+                                <td class="py-2.5 px-3 text-center">
+                                    <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" class="${selectClass}">
+                                        <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
+                                        <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
+                                    </select>
+                                </td>
+                                <td class="py-2.5 px-3 text-right">
+                                    <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${tx.currency === 'TWD' ? 'disabled' : ''} class="${inputClass} text-right font-mono disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                                </td>
+                                <td class="py-2.5 px-3 text-right font-black text-slate-900 text-xs">
+                                    NT$ ${Math.round(tx.totalTwd).toLocaleString()}
+                                </td>
+                                <td class="py-2.5 px-3 text-center">
+                                    <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition">
+                                        <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        // 每日行程花費
+                        rowHTML = `
+                            <tr class="border-b border-slate-100 bg-indigo-50/10 hover:bg-indigo-50/30 align-middle">
+                                <td class="py-2.5 px-3 text-xs font-bold text-indigo-600">${tx.date}</td>
+                                <td class="py-2.5 px-3 text-xs font-bold text-slate-700">
+                                    <span class="text-indigo-500 mr-1 select-none">📍</span>${tx.item}
+                                </td>
+                                <td class="py-2.5 px-3 text-xs font-bold text-slate-650">${tx.payer}</td>
+                                <td class="py-2.5 px-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPersonalClass}">${isPersonalLabel}</span>
+                                </td>
+                                <td class="py-2.5 px-3 text-center text-xs font-bold text-slate-500">${tx.qty}</td>
+                                <td class="py-2.5 px-3 text-right text-xs font-bold text-slate-600 font-mono">${tx.price.toLocaleString()}</td>
+                                <td class="py-2.5 px-3 text-center text-xs font-black text-slate-500">${tx.currency}</td>
+                                <td class="py-2.5 px-3">
+                                    <input type="number" step="0.0001" value="${tx.rate}" onchange="updateItineraryRate(${tx.dayIndex}, '${tx.activityId}', this.value)" ${tx.currency === 'TWD' ? 'disabled' : ''} class="${inputClass} text-right font-mono disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                                </td>
+                                <td class="py-2.5 px-3 text-right font-black text-indigo-750 text-xs">
+                                    NT$ ${Math.round(tx.totalTwd).toLocaleString()}
+                                </td>
+                                <td class="py-2.5 px-3 text-center">
+                                    <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[10px] text-indigo-600 bg-white hover:bg-indigo-50 border border-indigo-200 px-2 py-1 rounded font-bold transition whitespace-nowrap shadow-sm">
+                                        🔍 行程
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }
                 } else {
-                    // ================= 💻 3. 桌機版表格渲染 (每日行程花費 - 匯率後台可點擊編輯) =================
-                    const dateObj = new Date(tx.date);
-                    const weekday = isNaN(dateObj) ? "" : " (週" + ["日", "一", "二", "三", "四", "五", "六"][dateObj.getDay()] + ")";
-                    const splitLabel = tx.isPersonal ? "👤 個人自付" : "👥 分帳";
-                    const splitClass = tx.isPersonal ? "text-purple-600 bg-purple-50" : "text-orange-600 bg-orange-50";
-
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-100 bg-indigo-50/20 hover:bg-indigo-100/30 align-middle">
-                            <td class="py-2.5 px-3 text-[11px] font-bold text-indigo-600 whitespace-nowrap">${tx.date}${weekday}</td>
-                            <td class="py-2.5 px-3 text-xs font-bold text-slate-700">
-                                <div class="flex items-center space-x-1.5 truncate max-w-[200px]" title="${tx.item}">
-                                    <span class="text-indigo-500 select-none">📍</span>
-                                    <span>${tx.item}</span>
-                                </div>
+                    // 🔒 瀏覽者前台模式：全面採取最乾淨、零邊框的「統一純文字表格」渲染，字型完全一致！
+                    rowHTML = `
+                        <tr class="border-b border-slate-150 hover:bg-slate-50/50 align-middle text-slate-700">
+                            <td class="py-3.5 px-3 text-xs font-bold text-slate-500 whitespace-nowrap">${tx.date}</td>
+                            <td class="py-3.5 px-3 text-xs font-bold text-slate-800">
+                                ${tx.type === 'itinerary' ? '<span class="text-indigo-500 mr-1 select-none">📍</span>' : '<span class="text-emerald-500 mr-1 select-none">📝</span>'}${tx.item}
                             </td>
-                            <td class="py-2.5 px-3 text-xs font-semibold text-slate-600">${tx.payer}</td>
-                            <td class="py-2.5 px-3">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${splitClass}">${splitLabel}</span>
+                            <td class="py-3.5 px-3 text-xs font-bold text-slate-600">${tx.payer}</td>
+                            <td class="py-3.5 px-3 text-xs">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPersonalClass}">${isPersonalLabel}</span>
                             </td>
-                            <td class="py-2.5 px-3 text-center text-xs text-slate-400">${tx.qty}</td>
-                            <td class="py-2.5 px-3 text-right text-xs font-bold text-slate-600 font-mono">${tx.price.toLocaleString()}</td>
-                            <td class="py-2.5 px-3 text-center text-xs font-black text-slate-500">${tx.currency}</td>
-                            <td class="py-2.5 px-3">
-                                <input type="number" step="0.0001" value="${tx.rate}" 
-                                       onchange="updateItineraryRate(${tx.dayIndex}, '${tx.activityId}', this.value)" 
-                                       ${tx.currency === 'TWD' || !isAdminMode ? 'disabled' : ''} 
-                                       class="w-full bg-slate-55 hover:bg-white text-right border border-slate-200 rounded-lg p-1.5 text-xs font-mono text-slate-800 font-bold transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-700 text-xs">
+                            <td class="py-3.5 px-3 text-center text-xs font-semibold text-slate-500">${tx.qty}</td>
+                            <td class="py-3.5 px-3 text-right text-xs font-mono font-bold text-slate-650">${tx.price.toLocaleString()}</td>
+                            <td class="py-3.5 px-3 text-center text-xs font-extrabold text-slate-500">${tx.currency}</td>
+                            <td class="py-3.5 px-3 text-right text-xs font-mono text-slate-500">${tx.rate || "1.0"}</td>
+                            <td class="py-3.5 px-3 text-right text-xs font-black text-slate-900">
                                 NT$ ${Math.round(tx.totalTwd).toLocaleString()}
                             </td>
-                            <td class="py-2.5 px-3 text-center">
-                                <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[10px] text-indigo-600 bg-white hover:bg-indigo-50 border border-indigo-200 px-2 py-1 rounded font-bold transition whitespace-nowrap shadow-sm">
-                                    🔍 行程
-                                </button>
-                            </td>
+                            <td class="py-3.5 px-3 text-center text-slate-300 select-none text-sm">🔒</td>
                         </tr>
                     `;
+                }
 
-                    // ================= 📱 4. 行動裝置卡片版渲染 (每日行程花費 - 手機唯讀保護) =================
-                    cardContainer.innerHTML += `
-                        <div class="bg-indigo-50/20 p-4 rounded-xl border border-indigo-100 flex flex-col space-y-2.5 shadow-sm">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-bold">${tx.date}${weekday}</span>
-                                <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[10px] text-indigo-600 underline font-bold">查看行程</button>
-                            </div>
-                            <div class="text-xs font-bold text-slate-800 flex items-center space-x-1">
-                                <span class="text-indigo-500">📍</span>
-                                <span>${tx.item}</span>
-                            </div>
-                            <div class="grid grid-cols-2 text-[11px] text-slate-500 gap-y-1.5 items-center">
-                                <div>付款人: <span class="font-bold text-slate-700">${tx.payer}</span></div>
-                                <div class="text-right">分帳: <span class="font-bold ${tx.isPersonal ? 'text-purple-600' : 'text-orange-600'}">${tx.isPersonal ? '👤 個人' : '👥 分帳'}</span></div>
-                                <div>金額: <span class="font-mono font-bold text-slate-700">${tx.currency} ${tx.price.toLocaleString()}</span></div>
-                                
-                                <div class="flex items-center justify-end space-x-1">
-                                    <span>匯率:</span>
-                                    <input type="number" step="0.0001" value="${tx.rate}" 
-                                           onchange="updateItineraryRate(${tx.dayIndex}, '${tx.activityId}', this.value)" 
-                                           ${tx.currency === 'TWD' || !isAdminMode ? 'disabled' : ''} 
-                                           class="w-16 bg-white hover:bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-xs text-right font-mono font-bold text-slate-800 disabled:bg-slate-100/50 disabled:text-slate-400">
+                tbody.innerHTML += rowHTML;
+
+                // ================= 📱 2. 行動裝置卡片版渲染 (自適應不滾動) =================
+                let cardHTML = "";
+
+                if (isAdminMode) {
+                    if (tx.type === 'pretravel') {
+                        cardHTML = `
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col space-y-3 shadow-sm">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                                    <input type="date" value="${tx.date}" onchange="updatePreTravelRow(${tx.rawIndex}, 'date', this.value)" class="bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs font-bold text-slate-800">
+                                    <button type="button" onclick="deletePreTravelRow(${tx.rawIndex})" class="text-rose-500 p-1 hover:bg-rose-50 rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="col-span-2">
+                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">消費品項</label>
+                                        <input type="text" value="${tx.item}" onchange="updatePreTravelRow(${tx.rawIndex}, 'item', this.value)" class="${inputClass}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">付款人</label>
+                                        <select onchange="updatePreTravelRow(${tx.rawIndex}, 'payer', this.value)" class="${selectClass}">
+                                            ${payerOptions}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">分帳類型</label>
+                                        <select onchange="updatePreTravelRow(${tx.rawIndex}, 'isPersonal', this.value)" class="${selectClass}">
+                                            <option value="false" ${tx.isPersonal === false ? "selected" : ""}>👥 分帳</option>
+                                            <option value="true" ${tx.isPersonal === true ? "selected" : ""}>👤 個人</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">金額</label>
+                                        <div class="flex space-x-1">
+                                            <select onchange="updatePreTravelRow(${tx.rawIndex}, 'currency', this.value)" class="${selectClass} w-20">
+                                                <option value="TWD" ${tx.currency === "TWD" ? "selected" : ""}>TWD</option>
+                                                <option value="KRW" ${tx.currency === "KRW" ? "selected" : ""}>KRW</option>
+                                            </select>
+                                            <input type="number" value="${tx.price}" onchange="updatePreTravelRow(${tx.rawIndex}, 'price', this.value)" class="${inputClass} text-right">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-slate-400 font-bold mb-0.5">匯率</label>
+                                        <input type="number" step="0.0001" value="${tx.rate}" onchange="updatePreTravelRow(${tx.rawIndex}, 'rate', this.value)" ${tx.currency === 'TWD' ? 'disabled' : ''} class="${inputClass} text-right font-mono disabled:bg-slate-100">
+                                    </div>
+                                </div>
+                                <div class="border-t border-slate-100 pt-2 flex justify-between items-center text-xs font-bold">
+                                    <span class="text-slate-500">數量: ${tx.qty}</span>
+                                    <span class="text-indigo-600 font-black">台幣 NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
                                 </div>
                             </div>
-                            <div class="border-t border-indigo-100/50 pt-2 flex justify-end text-xs">
-                                <span class="font-black text-indigo-700">折算台幣: NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
+                        `;
+                    } else {
+                        cardHTML = `
+                            <div class="bg-indigo-50/20 p-4 rounded-xl border border-indigo-100 flex flex-col space-y-2.5 shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-bold">${tx.date}</span>
+                                    <button type="button" onclick="switchTabAndSelectDay(${tx.dayIndex})" class="text-[10px] text-indigo-600 underline font-bold">查看行程</button>
+                                </div>
+                                <div class="text-xs font-bold text-slate-800 flex items-center space-x-1">
+                                    <span class="text-indigo-500 select-none">📍</span><span>${tx.item}</span>
+                                </div>
+                                <div class="grid grid-cols-2 text-[11px] text-slate-550 gap-y-1.5 items-center">
+                                    <div>付款人: <span class="font-bold text-slate-700">${tx.payer}</span></div>
+                                    <div class="text-right">分帳: <span class="font-bold ${isPersonalClass}">${isPersonalLabel}</span></div>
+                                    <div>金額: <span class="font-mono font-bold text-slate-700">${tx.currency} ${tx.price.toLocaleString()}</span></div>
+                                    <div class="flex items-center justify-end space-x-1">
+                                        <span>匯率:</span>
+                                        <input type="number" step="0.0001" value="${tx.rate}" onchange="updateItineraryRate(${tx.dayIndex}, '${tx.activityId}', this.value)" ${tx.currency === 'TWD' ? 'disabled' : ''} class="w-16 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs text-right font-mono font-bold text-slate-850 disabled:bg-slate-100">
+                                    </div>
+                                </div>
+                                <div class="border-t border-indigo-100/50 pt-2 flex justify-end text-xs">
+                                    <span class="font-black text-indigo-700">折算台幣: NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    cardHTML = `
+                        <div class="bg-white p-4 rounded-xl border border-slate-150 flex flex-col space-y-2.5 shadow-sm text-slate-700">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                                <span class="text-xs font-bold text-slate-500">${tx.date}</span>
+                                <span class="text-[10px] text-slate-400 font-bold">🔒 唯讀</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-800 flex items-center space-x-1">
+                                ${tx.type === 'itinerary' ? '<span class="text-indigo-500 select-none">📍</span>' : '<span class="text-emerald-500 select-none">📝</span>'}
+                                <span>${tx.item}</span>
+                            </div>
+                            <div class="grid grid-cols-2 text-[11px] text-slate-550 gap-y-1">
+                                <div>付款人: <span class="font-bold text-slate-700">${tx.payer}</span></div>
+                                <div class="text-right">類型: <span class="font-bold ${isPersonalClass}">${isPersonalLabel}</span></div>
+                                <div>原始金額: <span class="font-mono font-bold text-slate-700">${tx.currency} ${tx.price.toLocaleString()}</span></div>
+                                <div class="text-right">匯率: <span class="font-mono text-slate-650">${tx.rate || "1.0"}</span></div>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2 flex justify-between items-center text-xs font-bold">
+                                <span class="text-slate-500">數量: ${tx.qty}</span>
+                                <span class="text-indigo-600 font-black">台幣折算: NT$ ${Math.round(tx.totalTwd).toLocaleString()}</span>
                             </div>
                         </div>
                     `;
                 }
+
+                cardContainer.innerHTML += cardHTML;
             });
 
             // 渲染分頁項目
@@ -2244,7 +2364,7 @@
                 paginationContainer.className = "flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-150 px-4 mt-4 gap-3";
                 paginationContainer.innerHTML = `
                     <div class="text-xs text-slate-500 font-medium select-none">
-                        顯示第 ${startIndex + 1} 至 ${Math.min(endIndex, allTx.length)} 筆，共 ${allTx.length} 筆記帳項目
+                        顯示第 ${startIndex + 1} 至 ${Math.min(endIndex, filteredTx.length)} 筆，共 ${filteredTx.length} 筆篩選項目
                     </div>
                     <div class="flex items-center space-x-1">
                         <button type="button" onclick="changeLedgerPage(${currentLedgerPage - 1})" ${currentLedgerPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm">
@@ -2261,8 +2381,6 @@
             } else {
                 paginationContainer.innerHTML = "";
             }
-
-            applyRoleVisibility(); 
         }
 
         function changeLedgerPage(page) {
@@ -2276,13 +2394,13 @@
             showToast(`已跳轉至 Day ${dayIndex + 1} 行程計畫`, "📍");
         }
 
-        // 行前費用增刪
+        // 行前費用增刪 (自動代入當天日期)
         function addPreTravelRow() {
             if (!isAdminMode) return;
             const todayDate = new Date().toISOString().split('T')[0];
             state.preTravelExpenses.push({
                 id: 'pre-' + Date.now(),
-                date: todayDate, // 預設當天日期
+                date: todayDate, 
                 item: "新記帳項目",
                 payer: state.companions[0],
                 qty: 1,
@@ -2312,7 +2430,7 @@
             } else if (field === "isPersonal") {
                 exp.isPersonal = value === "true";
             } else {
-                exp[field] = value; // 完美相容 date 與 item 修改
+                exp[field] = value; 
             }
 
             saveState();
@@ -2371,8 +2489,8 @@
                             <div class="flex items-center justify-between mb-3">
                                 <span class="bg-indigo-50 text-indigo-600 text-xs px-2.5 py-1 rounded-lg font-bold">${v.type}</span>
                                 <div class="flex space-x-2">
-                                    <button type="button" onclick="editVoucher('${v.id}')" class="admin-only text-xs text-slate-400 hover:text-indigo-600">修改</button>
-                                    <button type="button" onclick="deleteVoucher('${v.id}')" class="admin-only text-xs text-rose-500 hover:text-rose-700">刪除</button>
+                                    <button type="button" onclick="editVoucher('${v.id}')" class="admin-only text-xs text-slate-400 hover:text-indigo-600 font-bold">修改</button>
+                                    <button type="button" onclick="deleteVoucher('${v.id}')" class="admin-only text-xs text-rose-500 hover:text-rose-700 font-bold">刪除</button>
                                 </div>
                             </div>
                             <h4 class="font-bold text-slate-800 text-base mb-2">${v.title}</h4>
@@ -2480,8 +2598,6 @@
             container.innerHTML = "";
 
             const filterOwner = document.getElementById('packing-filter-owner').value;
-            
-            // 強制抓取當前兩位旅伴
             const targetOwners = [...state.companions]; 
 
             targetOwners.forEach(owner => {
@@ -2493,11 +2609,11 @@
 
                 let listHTML = "";
                 if (totalCount === 0) {
-                    listHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">準備工作已全部完成！👍</p>`;
+                    listHTML = `<p class="text-xs text-slate-400 italic py-4 text-center select-none">準備工作已全部完成！👍</p>`;
                 } else {
                     listHTML = items.map(item => `
                         <div class="flex items-center justify-between group py-2 px-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition rounded-lg">
-                            <label class="flex items-center space-x-3 cursor-pointer text-xs md:text-sm flex-1 ${item.checked ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">
+                            <label class="flex items-center space-x-3 cursor-pointer text-xs md:text-sm flex-1 ${item.checked ? 'line-through text-slate-400 font-bold' : 'text-slate-700 font-bold'}">
                                 <input type="checkbox" onchange="togglePackingCheck('${item.id}')" ${item.checked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4 transition duration-150">
                                 <span class="leading-tight">${item.item}</span>
                             </label>
@@ -2508,7 +2624,6 @@
                     `).join('');
                 }
 
-                // 🎯 新規格：不再切成碎卡片，直接呈現為優雅的左、右大欄行李箱面板
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col min-h-[400px] transition duration-200 hover:shadow-md">
                         <div>
@@ -2522,7 +2637,7 @@
                                 </span>
                             </div>
                             
-                            <!-- 進度條儀表 -->
+                            <!-- 進度條 -->
                             <div class="w-full bg-slate-100 h-1.5 rounded-full mb-4 overflow-hidden">
                                 <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: ${totalCount > 0 ? (completedCount / totalCount * 100) : 0}%"></div>
                             </div>
@@ -2586,14 +2701,14 @@
                     <div class="flex items-center justify-between p-4 hover:bg-slate-50/80 transition group gap-4">
                         <div class="flex items-start space-x-3 flex-1 min-w-0">
                             <span class="text-indigo-500 font-extrabold text-base mt-0.5 select-none">•</span>
-                            <p class="text-sm text-slate-700 leading-relaxed break-words pr-2">${note.content}</p>
+                            <p class="text-sm text-slate-700 leading-relaxed break-words pr-2 font-bold">${note.content}</p>
                         </div>
                         <div class="flex items-center space-x-3 flex-shrink-0">
-                            <button type="button" onclick="editNoteItem('${note.id}')" class="admin-only text-xs text-slate-400 hover:text-indigo-600 transition flex items-center space-x-1">
+                            <button type="button" onclick="editNoteItem('${note.id}')" class="admin-only text-xs text-slate-400 hover:text-indigo-600 transition flex items-center space-x-1 font-bold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                 <span class="hidden sm:inline">修改</span>
                             </button>
-                            <button type="button" onclick="deleteNoteItem('${note.id}')" class="admin-only text-xs text-rose-450 hover:text-rose-600 transition flex items-center space-x-1">
+                            <button type="button" onclick="deleteNoteItem('${note.id}')" class="admin-only text-xs text-rose-450 hover:text-rose-600 transition flex items-center space-x-1 font-bold">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 <span class="hidden sm:inline">刪除</span>
                             </button>
@@ -2672,7 +2787,6 @@
             state.activeTab = tabId;
             saveState(true); 
 
-            // 按鈕樣式
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = "tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50";
             });
@@ -2681,7 +2795,6 @@
                 activeBtn.className = "tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 bg-indigo-600 text-white shadow-md shadow-indigo-100";
             }
 
-            // 面板顯示
             document.querySelectorAll('.tab-panel').forEach(panel => {
                 panel.classList.add('hidden');
             });
@@ -2690,7 +2803,6 @@
                 activePanel.classList.remove('hidden');
             }
 
-            // 懸浮新增活動按鈕
             const floatBtn = document.getElementById('floating-add-btn');
             if (tabId === 'itinerary' && isAdminMode) {
                 floatBtn.classList.remove('hidden');
@@ -2764,7 +2876,7 @@
             );
         }
 
-        // 全域函數綁定
+        // 全域函數與動態篩選綁定
         window.setActStatus = setActStatus;
         window.switchTab = switchTab;
         window.selectDay = selectDay;
@@ -2813,6 +2925,7 @@
         window.submitLogin = submitLogin;
         window.toggleQuickRateField = toggleQuickRateField;
         window.submitQuickExpense = submitQuickExpense;
+        window.handleLedgerFilterChange = handleLedgerFilterChange;
         
     </script>
 </body>
