@@ -107,7 +107,7 @@
     </header>
 
     <!-- 分頁選單 (RWD 滑動保護) -->
-    <div class="bg-white border-b border-slate-150 shadow-sm sticky top-16 sm:top-20 z-30">
+    <div class="bg-white border-b border-slate-155 shadow-sm sticky top-16 sm:top-20 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto py-3 scrollbar-none" aria-label="Tabs">
                 <button type="button" onclick="switchTab('itinerary')" id="tab-itinerary" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap flex items-center space-x-1.5 bg-indigo-600 text-white shadow-md shadow-indigo-100">
@@ -239,7 +239,7 @@
                 </div>
             </div>
 
-            <!-- 消費分析看板 -->
+            <!-- 消費 analysis 看板 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-150 flex items-center justify-between">
                     <div>
@@ -295,7 +295,7 @@
                 <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
                     <div>
                         <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                             <span>分帳款項結算 (不含個人項目)</span>
                         </h3>
                         
@@ -310,7 +310,7 @@
                                 <span>已確認結清項目</span>
                             </h4>
                             <div class="text-xs text-slate-500 space-y-2 bg-slate-50/50 p-4 rounded-xl border border-slate-100" id="settled-history-list">
-                                尚無已結清歷史。
+                                尚無結清歷史。
                             </div>
                         </div>
                     </div>
@@ -492,7 +492,7 @@
                     <!-- 動態載入分類選項 -->
                 </div>
 
-                <!-- 韓文卡片清單區 (不貼邊設計，外層設有 px-4 防止裁切與卡片貼緊邊框) -->
+                <!-- 韓文卡片清單區 -->
                 <div class="px-2 sm:px-4 py-2">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="korean-phrases-container">
                         <!-- 動態渲染韓文會話 -->
@@ -537,6 +537,32 @@
     </button>
 
     <!-- ==================== 彈出視窗 ==================== -->
+
+    <!-- 編輯衝突解決彈出視窗 (樂觀鎖智慧合併) -->
+    <div id="conflict-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[9999]">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center space-x-3 text-amber-500 mb-3">
+                <svg class="w-8 h-8 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h4 class="font-black text-slate-900 text-lg">⚠️ 偵測到多人編輯衝突！</h4>
+            </div>
+            <p class="text-sm text-slate-500 leading-relaxed mb-6">
+                您的旅伴（或您在其他裝置上）剛才更新了雲端行程。為防止你們兩邊寫入的行程互相覆蓋，請選擇如何處理：
+            </p>
+            <div class="space-y-2.5">
+                <button type="button" onclick="resolveConflict('merge')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition shadow flex items-center justify-center space-x-1.5">
+                    <span>✨ 智慧合併資料 (最推薦)</span>
+                </button>
+                <button type="button" onclick="resolveConflict('overwrite')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 border border-slate-200">
+                    <span>💾 強制覆蓋雲端 (以本機為準)</span>
+                </button>
+                <button type="button" onclick="resolveConflict('reload')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 border border-rose-150">
+                    <span>🔄 放棄修改，載入雲端最新版</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- 韓文對話新增/編輯彈窗 -->
     <div id="korean-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
@@ -623,10 +649,16 @@
                 </div>
                 
                 <div id="sync-sandbox-warning" class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-850 space-y-1.5">
-                    <p class="font-bold flex items-center space-x-1 text-amber-900">
-                        <span>關於同步說明：</span>
+                    <p class="font-bold flex items-center space-x-1 text-amber-900 text-[13px]">
+                        <span>💡 雲端同步常見錯誤排查 (Failed to Fetch / 404)：</span>
                     </p>
-                    <p>您的所有編輯變更皆會保存在瀏覽器本機。若要使用雲端同步，請確保已配置合適的 Apps Script 連線端點。</p>
+                    <ul class="list-decimal pl-4 space-y-1 text-slate-700">
+                        <li><strong>HTTP 404 錯誤（找不到部署網頁）</strong>：代表您的 Google Apps Script 網頁應用程式網址已被刪除、未設定，或是複製錯誤。請至您的 Apps Script 視窗中，點選右上角「部署」->「管理部署」，複製最新產生的「網頁應用程式 URL」（網址尾端必須是 <code>/exec</code>），重新在此處貼上並儲存。</li>
+                        <li><strong>設定「任何人」可存取（最關鍵）</strong>：請至您 Google Apps Script 的編輯器點擊右上角「部署」->「管理部署」，將「誰可以存取（Who has access）」設定為 <strong>「任何人 (Anyone)」</strong>。如果設定為「僅限我自己」或「擁有 Google 帳號的人」，會被 Google 強制導向至驗證頁，瀏覽器會因安全政策阻擋連線並噴出 <code>Failed to fetch</code>。</li>
+                        <li><strong>第一次執行需要授權</strong>：請先手動用瀏覽器直接開啟您的 Apps Script 網址，並同意 Google 帳號權限（進階 -> 仍要前往），否則 API 無法工作。</li>
+                        <li><strong>伺服器冷啟動延遲</strong>：若長達數小時未存取，Google 伺服器冷啟動需耗時 10~15 秒，本更新已將連線逾時時間提高至 25 秒，可耐心等待重試。</li>
+                        <li><strong>關閉瀏覽器跨網站防護</strong>：若您使用 Brave 或 Safari 瀏覽器，請關閉其防護（Shields/跨網站追蹤阻擋）以免正常的 iframe 背景連線被瀏覽器阻斷。</li>
+                    </ul>
                 </div>
                 
                 <div class="flex items-center justify-between space-x-2 pt-2">
@@ -755,12 +787,12 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1">票券名稱</label>
-                    <input type="text" id="v-title" placeholder="例如：AREX 機場快線電子票" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-850">
+                    <input type="text" id="v-title" placeholder="例如：AREX 機場快線電子票" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-855">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">類別</label>
-                        <select id="v-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-850">
+                        <select id="v-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-855">
                             <option value="交通">交通</option>
                             <option value="住宿">住宿</option>
                             <option value="門票">門票</option>
@@ -770,7 +802,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-1">代碼/序號 (選填)</label>
-                        <input type="text" id="v-code" placeholder="QR-12345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-850">
+                        <input type="text" id="v-code" placeholder="QR-12345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-855">
                     </div>
                 </div>
                 <div>
@@ -829,6 +861,7 @@
 
     <!-- ==================== JavaScript 功能實作 ==================== -->
     <script>
+        // 開頭強制每次套用的 Web App 網址 (與你目前上線使用的 GAS 網址完全對應)
         const DEFAULT_SYNC_URL = "https://script.google.com/macros/s/AKfycbxAK4rsaO9Vv--BoOIFdiZixNnwoetyXkeGycjZwsU7ier-lMyPOCRrVFYAO2b9nSEJvA/exec"; 
 
         // 預設範本資料
@@ -836,6 +869,8 @@
             tripTitle: "首爾五天四夜旅程",
             activeTab: "itinerary",
             activeDayIndex: 0,
+            lastUpdated: Date.now(),
+            clientLastLoaded: Date.now(),
             googleScriptUrl: DEFAULT_SYNC_URL, 
             companions: ["小明", "莉莉"],
             days: [
@@ -846,7 +881,7 @@
                         {
                             id: "act-1",
                             time: "13:30",
-                            title: "仁川機場搭乘 AREX 直達首爾站 (這是一則特別設計的手機版超長行程標題，用以測試網頁標題會自動折行而不被隱藏遮蓋的效果)",
+                            title: "仁川機場搭乘 AREX 直達首爾站 (這是手機版超長行程標題測試)",
                             type: "transport",
                             voucher: "",
                             desc: "搭乘機場快線 AREX 直達首爾站。預先在平台購買單程車票並完成預約劃位。",
@@ -858,71 +893,34 @@
                             status: "completed",
                             mapUrl: "https://maps.google.com/?q=Incheon+Airport+AREX",
                             voucherUrl: "https://script.google.com"
-                        },
-                        {
-                            id: "act-2",
-                            time: "15:30",
-                            title: "飯店辦理入住與安置隨身行李",
-                            type: "lodging",
-                            voucher: "",
-                            desc: "前往首爾市區設計旅店 check-in，安置行李。",
-                            subSteps: [],
-                            cost: { payer: "莉莉", item: "飯店訂房服務費", amount: 3600, currency: "TWD", rate: 1.0, isPersonal: false }, 
-                            status: "todo",
-                            mapUrl: "https://maps.google.com/?q=Myeongdong+Hotel",
-                            voucherUrl: "#"
                         }
                     ]
                 }
             ],
             preTravelExpenses: [
-                { id: "pre-1", date: "2026-06-14", item: "首爾來回機票", payer: "莉莉", qty: 2, price: 12500, currency: "TWD", rate: 1.0, isPersonal: false }, 
-                { id: "pre-2", date: "2026-06-14", item: "海外上網 eSIM 卡", payer: "小明", qty: 2, price: 450, currency: "TWD", rate: 1.0, isPersonal: false },  
-                { id: "pre-3", date: "2026-06-14", item: "海外旅遊不便險", payer: "莉莉", qty: 2, price: 600, currency: "TWD", rate: 1.0, isPersonal: false }   
+                { id: "pre-1", date: "2026-06-14", item: "首爾來回機票", payer: "莉莉", qty: 2, price: 12500, currency: "TWD", rate: 1.0, isPersonal: false }
             ],
             settledHistory: [],
-            vouchers: [
-                { id: "v-1", title: "AREX 機場快線單程車票", type: "交通", code: "QR-88271399", note: "入境後前往 B1 AREX 售票機感應 QR 換票。", url: "https://www.klook.com" },
-                { id: "v-2", title: "首爾明洞住宿預約單", type: "住宿", code: "BOOKING-991827", note: "包含雙人房 4 晚，現場出示護照登記入住。", url: "" }
-            ],
-            packingList: [
-                { id: "p-1", item: "護照與紙本機票", owner: "小明", checked: false, category: "極度重要(★★★)", type: "手提行李" },
-                { id: "p-2", item: "身分證正影本", owner: "小明", checked: true, category: "極度重要(★★★)", type: "手提行李" },
-                { id: "p-3", item: "萬國轉接插頭與延長線", owner: "莉莉", checked: false, category: "3C類", type: "專屬行李箱" },
-                { id: "p-4", item: "個人常備藥物", owner: "莉莉", checked: false, category: "藥物包", type: "手提行李" },
-                { id: "p-5", item: "行動電源 (禁托運)", owner: "小明", checked: false, category: "3C類", type: "手提行李" },
-                { id: "p-6", item: "韓幣現金與雙幣信用卡", owner: "莉莉", checked: true, category: "極度重要(★★★)", type: "手提行李" }
-            ],
-            koreanList: [
-                { id: "k-1", category: "基本", original: "안녕하세요.", pronunciation: "An-nyeong-ha-se-yo.", translation: "你好。", note: "最萬用的禮貌問候語。" },
-                { id: "k-2", category: "基本", original: "감사합니다.", pronunciation: "Gam-sa-ham-ni-da.", translation: "謝謝您。", note: "常用客氣話。" },
-                { id: "k-3", category: "基本", original: "죄송합니다 / 잠시만요.", pronunciation: "Joe-song-ham-ni-da / Jam-si-man-yo.", translation: "對不起 / 請等一下、借過。", note: "在擁擠地鐵或不小心碰撞時使用。" },
-                { id: "k-4", category: "交通", original: "명동역으로 가주세요.", pronunciation: "Myeong-dong-yeok-eu-ro ga-ju-se-yo.", translation: "請帶我去明洞站。", note: "搭計程車時，可直接替換前方地名後播給司機看。" },
-                { id: "k-5", category: "購物", original: "이거 얼마예요?", pronunciation: "I-geo eol-ma-ye-yo?", translation: "這個多少錢？", note: "逛街挑選衣服、紀念品時必備。" },
-                { id: "k-6", category: "購物", original: "카드로 계산할게요.", pronunciation: "Ka-deu-ro gye-san-hal-ge-yo.", translation: "我用信用卡結帳。", note: "刷卡時使用。" },
-                { id: "k-7", category: "餐廳", original: "여기 주문할게요. 이거 주세요.", pronunciation: "Yeo-gi ju-mun-hal-ge-yo. I-geo ju-se-yo.", translation: "這裡要點餐。請給我這個。", note: "呼叫店員點餐時使用。" },
-                { id: "k-8", category: "餐廳", original: "맵지 않게 해주세요.", pronunciation: "Maep-ji an-ge hae-ju-se-yo.", translation: "請幫我做不辣的。", note: "怕辣者的保命句型。" },
-                { id: "k-9", category: "緊急", original: "도와주세요!", pronunciation: "Do-wa-ju-se-yo!", translation: "請幫幫我！", note: "遇到緊急事件時大聲呼救。" }
-            ],
-            notesList: [
-                { id: "n-1", content: "出站後記得買 T-money 卡儲值加值（韓國地鐵、公車感應超方便，空卡約 2,500 韓元）。" },
-                { id: "n-2", content: "eSIM 出發前一天要在台灣安裝好，下飛機直接開啟漫遊數據即可通訊。" },
-                { id: "n-3", content: "在韓國刷卡非常普及，但部分街邊傳統小吃與地下街僅接受韓元現金，建議備足零錢。" }
-            ]
+            vouchers: [],
+            packingList: [],
+            koreanList: [],
+            notesList: []
         };
 
         // 全域 State 初始化
         let state = JSON.parse(localStorage.getItem('travel_planner_state')) || defaultState;
 
-        // 安全權限控制 state
+        // 強制網址覆寫生效 (確保每次更動網頁都百分之百連向設定的 GAS 網址)
+        if (DEFAULT_SYNC_URL && DEFAULT_SYNC_URL.trim() !== "") {
+            state.googleScriptUrl = DEFAULT_SYNC_URL;
+        }
+
         let isAdminMode = localStorage.getItem('travel_planner_isAdmin') === 'true';
 
         let consecutiveFetchFailures = 0;
         let isSyncPausedDueToError = false;
-
-        if (DEFAULT_SYNC_URL && (!state.googleScriptUrl || state.googleScriptUrl === "")) {
-            state.googleScriptUrl = DEFAULT_SYNC_URL;
-        }
+        let lastSyncError = ""; // 全域記錄連線異常詳細原因
+        let conflictedServerData = null; 
 
         let editingDayIndex = null;
         let editingActivityId = null;
@@ -930,15 +928,10 @@
         let editingNoteId = null;
         let editingKoreanId = null;
 
-        // 記帳明細頁碼狀態與動態篩選狀態
         let currentLedgerPage = 1;
         let ledgerFilterType = "all"; 
         let ledgerFilterMember = "all"; 
-
-        // 注意事項分頁狀態 (超過20列自動分頁)
         let currentNotesPage = 1;
-
-        // 常用韓文當前分類篩選
         let currentKoreanCatTab = "全部";
 
         function timeToMinutes(t) {
@@ -1035,7 +1028,6 @@
 
         function saveState(skipCloud = false) {
             localStorage.setItem('travel_planner_state', JSON.stringify(state));
-            
             if (!skipCloud && state.googleScriptUrl) {
                 syncToGoogleSheet();
             }
@@ -1048,6 +1040,9 @@
             if (!state.notesList) state.notesList = [];
             if (!state.koreanList) state.koreanList = defaultState.koreanList;
             if (!state.packingList) state.packingList = defaultState.packingList;
+
+            if (!state.lastUpdated) state.lastUpdated = Date.now();
+            if (!state.clientLastLoaded) state.clientLastLoaded = Date.now();
 
             state.packingList.forEach(item => {
                 if (!item.category) item.category = "其他";
@@ -1185,6 +1180,7 @@
                 return;
             }
 
+            // 本機離線驗證備份
             if (user === "admin" && pass === "123") {
                 loginSuccess(user, pass, rememberEnabled);
                 return;
@@ -1196,26 +1192,29 @@
                 return;
             }
 
-            const text = document.getElementById('sync-status-text');
-            const prevText = text.textContent;
-            text.textContent = "驗證中...";
+            const statusBtnText = document.getElementById('sync-status-text');
+            const prevText = statusBtnText.textContent;
+            statusBtnText.textContent = "驗證中...";
 
             try {
+                // 遠端連線驗證 (向 Apps Script 發送驗證請求)
                 const response = await fetch(state.googleScriptUrl + "?action=loginVerify&user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass));
                 const result = await response.json();
                 
                 if (result && result.status === "success" && result.verified === true) {
                     loginSuccess(user, pass, rememberEnabled);
+                    statusBtnText.textContent = prevText;
                 } else {
                     const errorMsg = result && result.message ? result.message : "帳號或密碼錯誤";
                     document.getElementById('login-error-msg').textContent = errorMsg;
                     document.getElementById('login-error-msg').classList.remove('hidden');
-                    text.textContent = prevText;
+                    statusBtnText.textContent = prevText;
                 }
             } catch (err) {
+                console.error("驗證失敗:", err);
                 document.getElementById('login-error-msg').innerHTML = `連線失敗！請使用預設帳密 admin / 123 登入`;
                 document.getElementById('login-error-msg').classList.remove('hidden');
-                text.textContent = prevText;
+                statusBtnText.textContent = prevText;
             }
         }
 
@@ -1305,12 +1304,12 @@
             const dot = document.getElementById('sync-indicator-dot');
             const text = document.getElementById('sync-status-text');
 
-            if (state.googleScriptUrl) {
+            if (state.googleScriptUrl && state.googleScriptUrl !== "在此貼上你的_GAS_部署網址_以_exec_結尾" && state.googleScriptUrl !== "") {
                 if (isSyncPausedDueToError) {
                     btn.className = "flex items-center space-x-1 bg-amber-50 text-amber-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-amber-100 hover:bg-amber-100 transition shadow-sm text-xs cursor-pointer";
                     ping.className = "hidden";
                     dot.className = "relative inline-flex rounded-full h-2 w-2 bg-amber-500";
-                    text.textContent = "離線模式";
+                    text.textContent = lastSyncError || "連線異常(點擊排查)";
                 } else {
                     btn.className = "flex items-center space-x-1 bg-emerald-50 text-emerald-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-emerald-100 hover:bg-emerald-100 transition shadow-sm text-xs cursor-pointer";
                     ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
@@ -1321,22 +1320,52 @@
                 btn.className = "flex items-center space-x-1 bg-rose-50 text-rose-600 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-bold border border-rose-100 hover:bg-rose-100 transition shadow-sm text-xs cursor-pointer";
                 ping.className = "hidden";
                 dot.className = "relative inline-flex rounded-full h-2 w-2 bg-rose-500";
-                text.textContent = "未設定同步";
+                text.textContent = "未連線試算表";
             }
+        }
+
+        function isDataEqual(stateA, stateB) {
+            if (!stateA || !stateB) return false;
+            // 過濾掉瀏覽焦點、雲端網址等本機暫時狀態，僅比較核心旅遊資料
+            const cleanA = {
+                tripTitle: stateA.tripTitle,
+                companions: stateA.companions,
+                days: stateA.days,
+                preTravelExpenses: stateA.preTravelExpenses,
+                settledHistory: stateA.settledHistory,
+                vouchers: stateA.vouchers,
+                packingList: stateA.packingList,
+                koreanList: stateA.koreanList,
+                notesList: stateA.notesList
+            };
+            const cleanB = {
+                tripTitle: stateB.tripTitle,
+                companions: stateB.companions,
+                days: stateB.days,
+                preTravelExpenses: stateB.preTravelExpenses,
+                settledHistory: stateB.settledHistory,
+                vouchers: stateB.vouchers,
+                packingList: stateB.packingList,
+                koreanList: stateB.koreanList,
+                notesList: stateB.notesList
+            };
+            return JSON.stringify(cleanA) === JSON.stringify(cleanB);
         }
 
         async function syncToGoogleSheet() {
             if (!state.googleScriptUrl) return;
+            if (state.googleScriptUrl.trim() === "" || state.googleScriptUrl.includes("在此貼上")) return;
             const text = document.getElementById('sync-status-text');
             text.textContent = "同步中...";
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                // 💡 提高逾時至 25 秒，防止 Google 試算表伺服器冷啟動時被強制中斷
+                const timeoutId = setTimeout(() => controller.abort(), 25000);
                 
                 await fetch(state.googleScriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors', 
+                    mode: 'no-cors', // 採用 no-cors 跨網域傳輸，安全將整包 JSON 資料送入 Apps Script
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(state),
                     signal: controller.signal
@@ -1347,6 +1376,7 @@
                     text.textContent = "同步成功";
                     isSyncPausedDueToError = false;
                     consecutiveFetchFailures = 0;
+                    lastSyncError = "";
                     updateSyncStatusUI();
                 }, 1000);
 
@@ -1358,25 +1388,93 @@
         }
 
         async function fetchFromGoogleSheet() {
-            if (!state.googleScriptUrl || isSyncPausedDueToError) return;
+            if (!state.googleScriptUrl) return; // 不在最外層完全阻擋，由自動調度或點擊嘗試重連
+            if (state.googleScriptUrl.trim() === "" || state.googleScriptUrl.includes("在此貼上") || state.googleScriptUrl.includes("在此貼上你的_GAS")) {
+                return;
+            }
+            
+            const textElement = document.getElementById('sync-status-text');
+            if (textElement && textElement.textContent !== "已連線雲端") {
+                textElement.textContent = "雲端載入中...";
+            }
+
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                // 💡 讀取連線逾時延長至 25 秒，確保冷啟動有充足的時間啟動
+                const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-                const response = await fetch(state.googleScriptUrl, { signal: controller.signal });
+                const response = await fetch(state.googleScriptUrl, { 
+                    method: 'GET',
+                    signal: controller.signal 
+                });
                 clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP 連線錯誤: ${response.status}`);
+                }
 
                 const result = await response.json();
                 
-                if (result.status === "success" && result.data && Object.keys(result.data).length > 0) {
-                    state = result.data;
-                    consecutiveFetchFailures = 0; 
-                    isSyncPausedDueToError = false;
-                    saveState(true);
-                    applyState();
+                // 🌟 相容不同結構
+                let cloudData = null;
+                if (result && result.status === "success" && result.data) {
+                    cloudData = result.data;
+                } else if (result && result.days && Array.isArray(result.days)) {
+                    cloudData = result;
+                }
+                
+                if (cloudData && Object.keys(cloudData).length > 0) {
+                    const hasChanges = !isDataEqual(state, cloudData);
+
+                    if (hasChanges) {
+                        // 先備份當前的 Tab 與 DayIndex 瀏覽焦點 (防跳頁保護)
+                        const currentTab = state.activeTab;
+                        const currentDayIndex = state.activeDayIndex;
+
+                        state = cloudData;
+
+                        // 重新寫回焦點
+                        state.activeTab = currentTab;
+                        state.activeDayIndex = currentDayIndex;
+
+                        consecutiveFetchFailures = 0; 
+                        isSyncPausedDueToError = false;
+                        lastSyncError = "";
+                        saveState(true);
+
+                        // 🛠️ 記憶滾動位置以防畫面跳躍
+                        const savedScrollY = window.scrollY;
+                        const dayListEl = document.getElementById('day-list');
+                        const savedDayListScrollX = dayListEl ? dayListEl.scrollLeft : 0;
+
+                        applyState();
+
+                        // 🛠️ 瞬間還原滾動位置
+                        window.scrollTo(0, savedScrollY);
+                        const newDayListEl = document.getElementById('day-list');
+                        if (newDayListEl) {
+                            newDayListEl.scrollLeft = savedDayListScrollX;
+                        }
+                    } else {
+                        // 資料完全一致，只需靜態更新連線燈號，免去繁重耗能的 HTML 重新鋪設
+                        consecutiveFetchFailures = 0;
+                        isSyncPausedDueToError = false;
+                        lastSyncError = "";
+                        updateSyncStatusUI();
+                    }
                 }
             } catch (err) {
+                console.error("雲端載入異常:", err);
                 consecutiveFetchFailures++;
+                
+                // 💡 捕捉 404 狀態並直接中斷重連，避免發送過多無效 HTTP 請求
+                if (err.message && (err.message.includes("404") || err.message.includes("Not Found"))) {
+                    lastSyncError = "網址 404 錯誤";
+                    isSyncPausedDueToError = true; // 網址無效時直接停止自動重試，避免造成無限連線崩潰
+                } else {
+                    lastSyncError = "連線異常(點擊排查)";
+                }
+                
                 if (consecutiveFetchFailures >= 3) {
                     isSyncPausedDueToError = true; 
                 }
@@ -1385,10 +1483,116 @@
         }
 
         function checkAndSyncAuto() {
-            if (state.googleScriptUrl) {
+            if (state.googleScriptUrl && state.googleScriptUrl !== "在此貼上你的_GAS_部署網址_以_exec_結尾") {
                 fetchFromGoogleSheet();
-                setInterval(fetchFromGoogleSheet, 30000);
+                // 每 30 秒自動於背景載入一次，完全防跳頁
+                setInterval(() => {
+                    if (!isSyncPausedDueToError) {
+                        fetchFromGoogleSheet();
+                    } else {
+                        // 💡 智慧重連機制：若處於非 404 的普通錯誤狀態，放慢背景嘗試頻率（每 90 秒嘗試自動重連一次）
+                        if (lastSyncError !== "網址 404 錯誤") {
+                            consecutiveFetchFailures++;
+                            if (consecutiveFetchFailures % 3 === 0) {
+                                console.log("正在嘗試背景自動重新連線試算表...");
+                                isSyncPausedDueToError = false; 
+                                fetchFromGoogleSheet();
+                            }
+                        }
+                    }
+                }, 30000);
             }
+        }
+
+        // ==================== 樂觀鎖與衝突智慧合併演算法 ====================
+        function openConflictModal() {
+            document.getElementById('conflict-modal').classList.remove('hidden');
+            document.getElementById('conflict-modal').classList.add('flex');
+        }
+
+        function closeConflictModal() {
+            document.getElementById('conflict-modal').classList.add('hidden');
+            document.getElementById('conflict-modal').classList.remove('flex');
+        }
+
+        function resolveConflict(action) {
+            if (!conflictedServerData) {
+                closeConflictModal();
+                return;
+            }
+            
+            if (action === 'merge') {
+                state = mergeStates(state, conflictedServerData);
+                state.clientLastLoaded = conflictedServerData.lastUpdated; 
+                saveState(); 
+                applyState();
+                showToast("資料合併成功並同步回雲端！", "✨");
+            } else if (action === 'overwrite') {
+                state.clientLastLoaded = conflictedServerData.lastUpdated;
+                saveState(); 
+                applyState();
+                showToast("已強制使用您的修改覆蓋雲端！", "💾");
+            } else if (action === 'reload') {
+                state = conflictedServerData;
+                state.clientLastLoaded = conflictedServerData.lastUpdated;
+                saveState(true); 
+                applyState();
+                showToast("已放棄本地修改，載入雲端最新版！", "🔄");
+            }
+            
+            conflictedServerData = null;
+            closeConflictModal();
+        }
+
+        function mergeStates(local, server) {
+            let merged = JSON.parse(JSON.stringify(server)); 
+            
+            merged.tripTitle = local.tripTitle;
+            merged.companions = Array.from(new Set([...server.companions, ...local.companions]));
+            
+            function mergeArrayById(localList, serverList) {
+                let map = new Map();
+                serverList.forEach(item => map.set(item.id, item));
+                localList.forEach(item => map.set(item.id, item));
+                return Array.from(map.values());
+            }
+            
+            merged.preTravelExpenses = mergeArrayById(local.preTravelExpenses, server.preTravelExpenses);
+            merged.vouchers = mergeArrayById(local.vouchers, server.vouchers);
+            merged.packingList = mergeArrayById(local.packingList, server.packingList);
+            merged.koreanList = mergeArrayById(local.koreanList, server.koreanList);
+            merged.notesList = mergeArrayById(local.notesList, server.notesList);
+            merged.settledHistory = mergeArrayById(local.settledHistory || [], server.settledHistory || []);
+
+            let maxDays = Math.max(local.days.length, server.days.length);
+            merged.days = [];
+            
+            for (let i = 0; i < maxDays; i++) {
+                let lDay = local.days[i];
+                let sDay = server.days[i];
+                
+                if (lDay && sDay) {
+                    let actMap = new Map();
+                    sDay.activities.forEach(act => actMap.set(act.id, act));
+                    lDay.activities.forEach(act => actMap.set(act.id, act)); 
+                    
+                    merged.days.push({
+                        title: lDay.title, 
+                        date: lDay.date,
+                        activities: Array.from(actMap.values())
+                    });
+                } else if (lDay) {
+                    merged.days.push(lDay);
+                } else if (sDay) {
+                    merged.days.push(sDay);
+                }
+            }
+            
+            merged.activeTab = local.activeTab;
+            merged.activeDayIndex = local.activeDayIndex;
+            merged.googleScriptUrl = local.googleScriptUrl;
+            
+            return merged;
         }
 
         function openSyncModal() {
@@ -1396,7 +1600,7 @@
                 showToast("此功能僅限管理員開啟", "🔒");
                 return;
             }
-            document.getElementById('sync-url-input').value = state.googleScriptUrl || "";
+            document.getElementById('sync-url-input').value = (state.googleScriptUrl === "在此貼上你的_GAS_部署網址_以_exec_結尾") ? "" : (state.googleScriptUrl || "");
             document.getElementById('sync-modal').classList.remove('hidden');
             document.getElementById('sync-modal').classList.add('flex');
         }
@@ -1406,27 +1610,28 @@
         }
         function saveSyncSettings() {
             const url = document.getElementById('sync-url-input').value.trim();
-            state.googleScriptUrl = url;
+            state.googleScriptUrl = url || DEFAULT_SYNC_URL;
             isSyncPausedDueToError = false;
             consecutiveFetchFailures = 0;
+            lastSyncError = "";
             saveState();
             closeSyncModal();
             updateSyncStatusUI();
-            if (url) {
+            if (url && url !== "在此貼上你的_GAS_部署網址_以_exec_結尾") {
                 fetchFromGoogleSheet();
             }
         }
 
         function clearSyncUrl() {
-            state.googleScriptUrl = "";
+            state.googleScriptUrl = DEFAULT_SYNC_URL;
             isSyncPausedDueToError = false;
             consecutiveFetchFailures = 0;
+            lastSyncError = "";
             saveState();
             applyState();
             closeSyncModal();
             showToast("已切換為純本機運作模式", "🔌");
         }
-
 
         // ==================== 1. 行程規劃 ====================
         function renderDayList() {
@@ -1565,7 +1770,6 @@
                     ? `<div class="mt-4 flex flex-wrap gap-2">${mapBtn}${voucherBtn}</div>` 
                     : '';
 
-                // 行程標題採用 break-words 避免在手機畫面被 truncation 遮蓋
                 container.innerHTML += `
                     <div class="relative group">
                         <div class="absolute -left-[31px] md:-left-[39px] top-1.5 bg-white border-4 border-indigo-600 rounded-full w-4 h-4 z-10"></div>
@@ -1862,6 +2066,7 @@
             );
         }
 
+        // ==================== 2. 財務記帳 & 分帳 ====================
         function toggleQuickRateField(currency) {
             const rateInput = document.getElementById('quick-item-rate');
             if (currency === "TWD") {
@@ -2083,7 +2288,7 @@
 
             const settledHistoryContainer = document.getElementById('settled-history-list');
             if (state.settledHistory.length === 0) {
-                settledHistoryContainer.innerHTML = "尚無結清歷史。";
+                settledHistoryContainer.innerHTML = "尚無已結清歷史。";
             } else {
                 settledHistoryContainer.innerHTML = state.settledHistory.map(h => `
                     <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100 text-slate-600">
@@ -2166,7 +2371,6 @@
             const filteredSubtotal = filteredTx.reduce((sum, tx) => sum + tx.totalTwd, 0);
             document.getElementById('filtered-subtotal-twd').textContent = `NT$ ${Math.round(filteredSubtotal).toLocaleString()}`;
 
-            // 注意事項或記帳明細超過20列就要自動分頁 (實作 20 列限制分頁)
             const itemsPerPage = 20;
             const totalPages = Math.ceil(filteredTx.length / itemsPerPage) || 1;
             
@@ -2279,7 +2483,7 @@
                             <td class="py-3.5 px-3 text-xs font-bold text-slate-800 break-words">
                                 ${tx.item}
                             </td>
-                            <td class="py-3.5 px-3 text-xs font-bold text-slate-600">${tx.payer}</td>
+                            <td class="py-3.5 px-3 text-xs font-bold text-slate-650">${tx.payer}</td>
                             <td class="py-3.5 px-3 text-xs">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPersonalClass}">${isPersonalLabel}</span>
                             </td>
@@ -2290,7 +2494,7 @@
                             <td class="py-3.5 px-3 text-right text-xs font-black text-slate-900">
                                 NT$ ${Math.round(tx.totalTwd).toLocaleString()}
                             </td>
-                            <td class="py-3.5 px-3 text-center text-slate-300 select-none text-sm">🔒</td>
+                            <td class="py-3.5 px-3 text-center text-slate-330 select-none text-sm">🔒</td>
                         </tr>
                     `;
                 }
@@ -2622,7 +2826,6 @@
             );
         }
 
-        // 行李分類配色
         const categoryBadgeStyles = {
             "極度重要(★★★)": "text-rose-600 bg-rose-50 border-rose-100",
             "包包": "text-indigo-600 bg-indigo-50 border-indigo-100",
@@ -2770,7 +2973,6 @@
             renderPackingList();
         }
 
-
         // ==================== 5. 常用韓文對話模組 (不貼邊 & 極簡) ====================
         function renderKoreanList() {
             const catTabsContainer = document.getElementById('korean-cat-tabs');
@@ -2782,7 +2984,7 @@
             const categories = ["全部", "基本", "交通", "購物", "餐廳", "緊急", "自訂"];
             categories.forEach(cat => {
                 const activeClass = currentKoreanCatTab === cat 
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-150" 
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-155" 
                     : "bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/60";
 
                 catTabsContainer.innerHTML += `
@@ -2806,7 +3008,6 @@
                 return;
             }
 
-            // 調整內距 (p-6) 以預留足夠的手機版安全邊框呼吸空間
             filteredPhrases.forEach(kor => {
                 phrasesContainer.innerHTML += `
                     <div class="bg-white border border-slate-150 hover:border-indigo-300 hover:shadow-md transition duration-200 rounded-2xl p-6 flex flex-col justify-between shadow-sm relative group">
@@ -2837,7 +3038,7 @@
                         </div>
 
                         ${kor.note ? `
-                            <div class="mt-2 pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-medium whitespace-pre-wrap leading-relaxed bg-slate-50/50 p-2.5 rounded-lg break-words">
+                            <div class="mt-2 pt-2 border-t border-slate-100 text-[11px] text-slate-550 font-medium whitespace-pre-wrap leading-relaxed bg-slate-50/50 p-2.5 rounded-lg break-words">
                                 ${kor.note}
                             </div>
                         ` : ''}
@@ -2955,7 +3156,6 @@
             );
         }
 
-
         // ==================== 6. 旅行注意事項 (限制20列分頁) ====================
         function renderNotesList() {
             const container = document.getElementById('notes-container');
@@ -2968,7 +3168,6 @@
                 return;
             }
 
-            // 超過20列自動分頁
             const itemsPerPage = 20;
             const totalPages = Math.ceil(state.notesList.length / itemsPerPage) || 1;
 
@@ -2998,7 +3197,6 @@
                 `;
             });
 
-            // 注意事項分頁 UI 控制列
             if (totalPages > 1) {
                 paginationContainer.className = "flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-150 px-4 mt-4 gap-3";
                 paginationContainer.innerHTML = `
@@ -3239,6 +3437,8 @@
         window.deleteKoreanItem = deleteKoreanItem;
         window.speakKorean = speakKorean;
         window.selectKoreanCategory = selectKoreanCategory;
+        
+        window.resolveConflict = resolveConflict;
 
     </script>
 </body>
