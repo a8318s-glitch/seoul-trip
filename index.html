@@ -1084,6 +1084,9 @@
             updateSyncStatusUI();
             populateDropdowns();
             applyRoleVisibility(); 
+            
+            // 修正關鍵：重新整理網頁後，自動切換至上一次瀏覽的分頁，避免每次都強制跳回行程規劃
+            switchTab(state.activeTab || 'itinerary');
         }
 
         function applyRoleVisibility() {
